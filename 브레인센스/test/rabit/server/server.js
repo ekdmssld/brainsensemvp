@@ -5,6 +5,8 @@ import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import authRoutes from './routes/auth.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import kitRoutes from './routes/kits.js';
+import projectRoutes from './routes/projects.js';
 
 // 환경 변수 로드
 dotenv.config();
@@ -25,6 +27,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // 라우트
 app.use('/api/auth', authRoutes);
+app.use('/api/kits', kitRoutes);
+app.use('/api/projects', projectRoutes);
 
 // 헬스체크 엔드포인트
 app.get('/api/health', (req, res) => {

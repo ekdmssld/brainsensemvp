@@ -1,10 +1,184 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LABIT - 키트 선택</title>
 
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/steps.css">
+</head>
+<body class="bg-gray-50">
+<!-- Header -->
+<header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="container mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center space-x-4">
+                <h1 class="text-2xl font-bold text-indigo-600">LABIT</h1>
+                <span class="text-gray-300">|</span>
+                <span class="text-gray-600" id="selected-kit-name">키트를 선택해주세요</span>
+            </div>
+
+            <!-- User Info & Logout -->
+            <div class="flex items-center space-x-4">
+                <div class="text-right">
+                    <p class="text-sm font-medium text-gray-700" id="user-name"></p>
+                    <p class="text-xs text-gray-500" id="user-email"></p>
+                </div>
+                <button
+                        id="logout-btn"
+                        class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition"
+                >
+                    로그아웃
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Progress Bar -->
+<div class="bg-white border-b">
+    <div class="container mx-auto px-6 py-3">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">1</div>
+                <span class="text-sm font-medium text-indigo-600">키트 선택</span>
+            </div>
+            <div class="flex-1 h-1 bg-gray-200 mx-4"></div>
+            <div class="flex items-center space-x-2 opacity-50">
+                <div class="w-8 h-8 bg-gray-300 text-white rounded-full flex items-center justify-center text-sm">2</div>
+                <span class="text-sm text-gray-500">브레인스토밍</span>
+            </div>
+            <div class="flex-1 h-1 bg-gray-200 mx-4"></div>
+            <div class="flex items-center space-x-2 opacity-50">
+                <div class="w-8 h-8 bg-gray-300 text-white rounded-full flex items-center justify-center text-sm">3</div>
+                <span class="text-sm text-gray-500">회로 설계</span>
+            </div>
+            <div class="flex-1 h-1 bg-gray-200 mx-4"></div>
+            <div class="flex items-center space-x-2 opacity-50">
+                <div class="w-8 h-8 bg-gray-300 text-white rounded-full flex items-center justify-center text-sm">4</div>
+                <span class="text-sm text-gray-500">코딩</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<main class="container mx-auto px-6 py-8">
+    <!-- Title Section -->
+    <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-800 mb-3">어떤 키트로 실험할까요?</h2>
+        <p class="text-gray-600">학습하고 싶은 AIoT 키트를 선택해주세요</p>
+    </div>
+
+    <!-- Alert Message -->
+    <div id="alert-message" class="hidden mb-6"></div>
+
+    <!-- Kit Categories -->
+    <div class="mb-8">
+        <label class="block text-sm font-medium text-gray-700 mb-3">대주제 선택</label>
+        <select
+                id="category-select"
+                class="w-full max-w-md px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+        >
+            <option value="">카테고리를 선택하세요</option>
+        </select>
+    </div>
+
+    <!-- Kit Cards -->
+    <div id="kits-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Loading Spinner -->
+        <div id="loading-spinner" class="col-span-full flex justify-center items-center py-12">
+            <div class="spinner"></div>
+            <span class="ml-3 text-gray-600">키트 정보를 불러오는 중...</span>
+        </div>
+    </div>
+
+    <!-- No Kits Message -->
+    <div id="no-kits-message" class="hidden col-span-full text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">선택 가능한 키트가 없습니다</h3>
+        <p class="mt-1 text-sm text-gray-500">다른 카테고리를 선택해주세요</p>
+    </div>
+
+    <!-- Next Button (Hidden initially) -->
+    <div id="next-button-container" class="hidden mt-12 text-center">
+        <button
+                id="next-step-btn"
+                class="px-8 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+        >
+            다음 단계로 →
+        </button>
+    </div>
+</main>
+
+<!-- Kit Detail Modal -->
+<div id="kit-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="p-6">
+            <!-- Modal Header -->
+            <div class="flex justify-between items-start mb-4">
+                <h3 id="modal-title" class="text-2xl font-bold text-gray-800"></h3>
+                <button id="close-modal" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Modal Image -->
+            <img id="modal-image" src="" alt="" class="w-full h-64 object-cover rounded-lg mb-4">
+
+            <!-- Modal Content -->
+            <div class="space-y-4">
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">설명</h4>
+                    <p id="modal-description" class="text-gray-600"></p>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">포함 구성품</h4>
+                    <ul id="modal-components" class="list-disc list-inside text-gray-600 space-y-1"></ul>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">학습 목표</h4>
+                    <ul id="modal-objectives" class="list-disc list-inside text-gray-600 space-y-1"></ul>
+                </div>
+
+                <div class="flex items-center space-x-4 pt-4 border-t">
+                    <span class="text-sm text-gray-500">난이도:</span>
+                    <div id="modal-difficulty" class="flex space-x-1"></div>
+                </div>
+            </div>
+
+            <!-- Modal Actions -->
+            <div class="mt-6 flex space-x-3">
+                <button
+                        id="modal-select-btn"
+                        class="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition"
+                >
+                    이 키트 선택하기
+                </button>
+                <button
+                        id="modal-cancel-btn"
+                        class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition"
+                >
+                    취소
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script type="module" src="../js/pages/step1-kit-selection.js"></script>
 </body>
 </html>

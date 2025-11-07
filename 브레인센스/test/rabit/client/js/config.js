@@ -1,6 +1,6 @@
 // config.js - 애플리케이션 설정
-export const API_BASE_URL = 'http://localhost:5000/api';
-export const SOCKET_URL = 'http://localhost:5000';
+export const API_BASE_URL = 'http://localhost:5050/api';
+export const SOCKET_URL = 'http://localhost:5050';
 
 export const ROUTES = {
     LOGIN: 'login.html',
