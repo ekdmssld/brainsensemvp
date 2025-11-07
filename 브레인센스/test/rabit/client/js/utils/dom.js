@@ -1,3 +1,6 @@
+export const $ = (selector) => document.querySelector(selector);
+export const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+
 // dom.js - DOM 조작 헬퍼 함수
 export function showAlert(type, message, elementId = 'alert-message') {
     const alertElement = document.getElementById(elementId);

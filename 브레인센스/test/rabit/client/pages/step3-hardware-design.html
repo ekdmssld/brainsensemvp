@@ -1,10 +1,245 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LABIT - 회로 설계</title>
 
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../assets/css/main.css">
+
+    <style>
+        .component-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .component-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .component-card.selected {
+            border: 3px solid #4f46e5;
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+        }
+
+        .component-card.selected::before {
+            content: '✓';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #4f46e5;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .pin-badge {
+            display: inline-block;
+            background: #fbbf24;
+            color: #92400e;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 4px;
+        }
+
+        .connection-diagram {
+            max-width: 100%;
+            border-radius: 8px;
+            background: #f9fafb;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+<!-- Header -->
+<header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="container mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-2xl font-bold text-indigo-600">LABIT</h1>
+                <span class="text-gray-300">|</span>
+                <span class="text-gray-800 font-semibold" id="kit-name">키트명</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="text-right">
+                    <p class="text-sm font-medium text-gray-700" id="user-name"></p>
+                </div>
+                <button id="logout-btn" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition">
+                    로그아웃
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Progress Bar -->
+<div class="bg-white border-b">
+    <div class="container mx-auto px-6 py-3">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2 opacity-50">
+                <div class="w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm">✓</div>
+                <span class="text-sm text-gray-500">브레인스토밍</span>
+            </div>
+            <div class="flex-1 h-1 bg-indigo-600 mx-4"></div>
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">3</div>
+                <span class="text-sm font-medium text-indigo-600">회로 설계</span>
+            </div>
+            <div class="flex-1 h-1 bg-gray-200 mx-4"></div>
+            <div class="flex items-center space-x-2 opacity-50">
+                <div class="w-8 h-8 bg-gray-300 text-white rounded-full flex items-center justify-center text-sm">4</div>
+                <span class="text-sm text-gray-500">코딩</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<main class="container mx-auto px-6 py-8">
+    <!-- Title Section -->
+    <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-3">하드웨어 구성품을 선택하세요</h2>
+        <p class="text-gray-600">사용할 센서와 부품을 클릭하여 선택하고, 연결 방법을 확인하세요</p>
+    </div>
+
+    <!-- Alert Message -->
+    <div id="alert-message" class="hidden mb-6"></div>
+
+    <!-- Instructions -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div class="flex items-start">
+            <svg class="w-6 h-6 text-blue-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div>
+                <h4 class="font-semibold text-blue-800 mb-1">회로 설계 가이드</h4>
+                <ul class="text-sm text-blue-700 space-y-1">
+                    <li>• 카드를 클릭하여 사용할 구성품을 선택하세요</li>
+                    <li>• "연결 방법 보기" 버튼을 클릭하면 아두이노 연결 방법이 표시됩니다</li>
+                    <li>• 최소 1개 이상의 센서를 선택해야 합니다</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Arduino Board Image -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">🔌 아두이노 보드</h3>
+        <div class="flex justify-center items-center bg-gray-100 rounded-lg p-8">
+            <div class="text-center">
+                <svg class="w-48 h-48 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+                </svg>
+                <p class="text-gray-600 mt-4 font-semibold">Arduino Uno / Nano</p>
+                <p class="text-sm text-gray-500">디지털 핀: D0-D13 | 아날로그 핀: A0-A5</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Components Grid -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold text-gray-800">📦 구성품 목록</h3>
+            <div class="text-sm text-gray-600">
+                선택됨: <span id="selected-count" class="font-bold text-indigo-600">0</span>개
+            </div>
+        </div>
+
+        <div id="components-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Component cards will be generated here -->
+        </div>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="flex justify-between items-center mt-8">
+        <button id="back-btn" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition">
+            ← 이전 단계
+        </button>
+        <button id="next-btn" class="px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+            다음 단계로 →
+        </button>
+    </div>
+</main>
+
+<!-- Connection Modal -->
+<div id="connection-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="p-6">
+            <!-- Modal Header -->
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 id="modal-title" class="text-2xl font-bold text-gray-800"></h3>
+                    <p id="modal-type" class="text-sm text-gray-500 mt-1"></p>
+                </div>
+                <button id="close-modal" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="space-y-6">
+                <!-- Component Description -->
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">📝 설명</h4>
+                    <p id="modal-description" class="text-gray-600"></p>
+                </div>
+
+                <!-- Pin Connection -->
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <h4 class="font-semibold text-yellow-800 mb-2">🔌 핀 연결</h4>
+                    <div id="modal-pins" class="text-gray-700"></div>
+                </div>
+
+                <!-- Connection Diagram -->
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">📐 연결 다이어그램</h4>
+                    <div id="modal-diagram" class="connection-diagram">
+                        <!-- Diagram will be inserted here -->
+                    </div>
+                </div>
+
+                <!-- Connection Steps -->
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-2">🔧 연결 순서</h4>
+                    <ol id="modal-steps" class="list-decimal list-inside text-gray-600 space-y-2">
+                        <!-- Steps will be inserted here -->
+                    </ol>
+                </div>
+
+                <!-- Notes -->
+                <div id="modal-notes-container" class="hidden bg-red-50 border border-red-200 rounded-lg p-4">
+                    <h4 class="font-semibold text-red-800 mb-2">⚠️ 주의사항</h4>
+                    <ul id="modal-notes" class="list-disc list-inside text-red-700 text-sm space-y-1">
+                        <!-- Notes will be inserted here -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Modal Actions -->
+            <div class="mt-6 flex space-x-3">
+                <button id="modal-select-btn" class="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition">
+                    이 구성품 선택하기
+                </button>
+                <button id="modal-cancel-btn" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition">
+                    닫기
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="../js/pages/step3-hardware-design.js"></script>
 </body>
 </html>

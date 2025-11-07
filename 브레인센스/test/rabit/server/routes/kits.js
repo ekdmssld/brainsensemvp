@@ -1,23 +1,31 @@
-// routes/kits.js - 키트 관련 라우트
+// server/routes/kits.js
 import express from 'express';
 import {
     getKits,
-    getKitById,
     getKitsByCategory,
-    createKit
+    getKitById,
+    createKit,
+    getKitComponents,
+    getComponentDetail,
 } from '../controllers/kitController.js';
-import { protect, authorize } from '../middleware/auth.js';
+// import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// 모든 라우트에 인증 적용
-router.use(protect);
+// router.use(protect);
 
+// 목록/카테고리
 router.get('/', getKits);
-router.get('/:id', getKitById);
 router.get('/category/:category', getKitsByCategory);
 
-// 관리자만 접근 가능
-router.post('/', authorize('admin'), createKit);
+// (Step3) 컴포넌트 목록/상세
+router.get('/:kitId/components', getKitComponents);
+router.get('/:kitId/components/:componentId', getComponentDetail);
+
+// 단건 상세
+router.get('/:id', getKitById);
+
+// 생성(관리자)
+router.post('/', createKit);
 
 export default router;

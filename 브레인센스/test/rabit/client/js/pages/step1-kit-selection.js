@@ -226,7 +226,7 @@ class KitSelectionPage {
 
         // 선택된 키트를 로컬 스토리지에 저장
         Storage.setItem('selectedKit', kit);
-        console.log("선택된 키트 저장 : ", kit);
+
 
         // 헤더에 키트명 표시
         document.getElementById('selected-kit-name').textContent = kit.name;
