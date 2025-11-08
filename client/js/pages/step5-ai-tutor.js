@@ -379,7 +379,7 @@ class AITutorPage {
         this.startMonitorBtn.addEventListener('click', () => this.startSerialMonitor());
         this.backBtn.addEventListener('click', () => window.location.href = 'step4-coding.html');
         this.nextBtn.addEventListener('click', () => {
-            showAlert('success', '모든 단계를 완료했습니다!', 'alert-message');
+            window.location.href='step6-data-upload.html';
         });
         document.getElementById('logout-btn').addEventListener('click', () => Auth.logout());
 

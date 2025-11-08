@@ -4,9 +4,7 @@ import mongoose from 'mongoose';
 const connectDB = async () => {
     try {
         const conn = await mongoose.connect(process.env.MONGODB_URI, {
-            // Mongoose 6+ 에서는 이 옵션들이 기본값이므로 생략 가능
-            // useNewUrlParser: true,
-            // useUnifiedTopology: true,
+            serverSelectionTimeoutMS:5000, family:4
         });
 
         console.log(`MongoDB Connected: ${conn.connection.host}`);

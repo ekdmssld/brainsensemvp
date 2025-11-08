@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <title>Step 7 · AI 결과 & 실시간 테스트</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <style>
+        .wrap{max-width:1200px;margin:36px auto;padding:0 16px}
+        .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+        .card{background:#fff;border:1px solid #eee;border-radius:12px;padding:16px;box-shadow:0 2px 8px #0000000d}
+        .kpi{font-size:28px;font-weight:700}
+        table.cm{border-collapse:collapse;width:100%}
+        table.cm td, table.cm th{border:1px solid #e5e7eb;padding:8px;text-align:center}
+        .muted{color:#6b7280}
+        .actions{display:flex;gap:8px;flex-wrap:wrap}
+        .pill{padding:8px 12px;border-radius:999px;background:#f3f4f6}
+        .input{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px}
+        .btn{padding:10px 14px;border-radius:10px;border:0;background:#4f46e5;color:#fff;font-weight:600;cursor:pointer}
+        .btn.secondary{background:#0ea5e9}
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <h1>✅ AI 모델 학습 결과</h1>
+    <p class="muted">Step6에서 학습한 모델의 성능과 규칙을 확인하고, 실시간으로 테스트합니다.</p>
+
+    <div class="grid" style="margin-top:16px">
+        <div class="card">
+            <h3>📈 모델 성능</h3>
+            <div class="kpi" id="acc-train">Train 정확도: -</div>
+            <div class="kpi" id="acc-test" style="margin-top:4px">Test 정확도: -</div>
+            <div class="muted" id="model-id" style="margin-top:8px"></div>
+        </div>
+        <div class="card">
+            <h3>🧠 AI가 학습한 규칙 (요약)</h3>
+            <pre id="rules" class="muted" style="white-space:pre-wrap"></pre>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+        <h3>🔢 혼동 행렬 (Confusion Matrix)</h3>
+        <div id="cm-wrap"></div>
+    </div>
+
+    <div class="grid" style="margin-top:16px">
+        <div class="card">
+            <h3>🧪 실시간 테스트 (수동 입력)</h3>
+            <input id="val-input" class="input" placeholder="예: 735 (센서값 또는 특징값)" />
+            <div class="actions" style="margin-top:10px">
+                <button id="btn-predict" class="btn">예측하기</button>
+                <button id="btn-back" class="btn secondary">← 데이터 더 모으기</button>
+            </div>
+            <div id="pred-out" style="margin-top:12px" class="pill">결과가 여기에 표시됩니다</div>
+        </div>
+        <div class="card">
+            <h3>📡 실시간 테스트 (시리얼/센서 연동 예정)</h3>
+            <p class="muted">여기는 Web Serial 연동 섹션(후속 스텝). 현재는 데모 값으로 동작합니다.</p>
+            <button id="btn-demo-stream" class="btn secondary">데모 스트림 10회</button>
+            <div id="stream-log" style="margin-top:12px;max-height:200px;overflow:auto;font-family:ui-monospace,Consolas,monospace"></div>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="./js/pages/step7-result.js"></script>
+</body>
+</html>

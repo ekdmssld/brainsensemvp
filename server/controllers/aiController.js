@@ -2,6 +2,54 @@
 import OllamaService from '../services/ollamaService.js';
 import Kit from '../models/Kit.js';
 
+
+// 파일 상단 근처에 전역 Map 하나 준비 (서버 재시작 시 사라짐)
+const AI_MODELS = new Map(); // modelId -> { rules, metrics }
+
+// // 기존 trainRules 수정 X, 아래 후처리만 추가해도 됨
+// export const trainRules = async (req, res) => {
+//     try {
+//         const { sit = [], stand = [], walk = [] } = req.body || {};
+//         const model = await OllamaService.induceRulesFromValues({ sit, stand, walk });
+//         // model 예시 기대: { rules:[...], metrics:{trainAcc, testAcc, cm}, explain:"..." }
+//
+//         // modelId 발급해서 저장
+//         const modelId = crypto.randomUUID?.() || Date.now().toString();
+//         AI_MODELS.set(modelId, model);
+//
+//         return res.json({ success: true, modelId, ...model });
+//     } catch (e) {
+//         console.error('[trainRules] error:', e);
+//         return res.status(500).json({ success: false, message: e.message || 'server error' });
+//     }
+// };
+
+// 학습 결과 조회
+export const getModel = async (req, res) => {
+    const m = AI_MODELS.get(req.params.id);
+    if (!m) return res.status(404).json({ success:false, message:'model not found' });
+    return res.json({ success:true, modelId: req.params.id, ...m });
+};
+
+// 단일 값 예측 (rules 기반 간단 평가; 실제 로직은 서비스에 맞게 변경)
+export const predictValue = async (req, res) => {
+    const m = AI_MODELS.get(req.params.id);
+    if (!m) return res.status(404).json({ success:false, message:'model not found' });
+
+    const v = Number(req.body?.value);
+    if (Number.isNaN(v)) return res.status(400).json({ success:false, message:'invalid value' });
+
+    // ① Ollama에 룰/프롬프트로 질의해서 받아오는 방식이 정석이면 이렇게:
+    // const out = await OllamaService.predictByRules(m.rules, v);
+
+    // ② 일단 데모용 규칙(임계치) 예시 — 실제로는 위 OllamaService 호출 추천
+    let label = '서있음';
+    if (v >= 600) label = '앉아있음';
+    else if (v >= 400) label = '걷는중';
+    const confidence = 0.9; // 데모 값
+
+    return res.json({ success:true, label, confidence });
+};
 // @desc    단일 질문에 대한 코드 라인 생성
 // @route   POST /api/ai/generate-code-line
 // @access  Private
@@ -119,5 +167,16 @@ export const checkAIHealth = async (req, res) => {
                 models: []
             }
         });
+    }
+};
+
+export const trainRules = async (req, res) => {
+    try {
+        const { sit = [], stand = [], walk = [] } = req.body || {};
+        const model = await OllamaService.induceRulesFromValues({ sit, stand, walk });
+        return res.json({ success: true, model });
+    } catch (e) {
+        console.error('[trainRules] error:', e);
+        return res.status(500).json({ success: false, message: e.message || 'server error' });
     }
 };

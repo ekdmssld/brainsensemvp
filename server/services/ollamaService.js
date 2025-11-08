@@ -134,6 +134,50 @@ Korean explanation:`;
             num_predict: 40
         });
     }
+    // 파일 하단 어딘가 (class OllamaService 내부)에 추가
+    static async induceRulesFromValues({ sit = [], stand = [], walk = [] }) {
+        const prompt = `
+너는 초등·중학생도 이해할 수 있는 간단한 규칙 기반 분류기를 만드는 도우미야.
+아래는 압력센서 값(정수) 데이터셋이야. 각 라벨의 값 범위를 관찰해서
+사람이 이해할 수 있는 간단한 if-else 규칙을 JSON으로 만들어줘.
+
+[앉아있음] ${sit.join(', ')}
+[서있음]   ${stand.join(', ')}
+[걷는중]   ${walk.join(', ')}
+
+요구사항:
+1) "rules"는 위에서 아래로 평가되는 if-else 체인으로 작성
+2) 각 rule의 "condition"에는 value만 사용 (예: "value >= 600 && value < 800")
+3) 라벨은 "앉아있음", "서있음", "걷는중" 중 하나
+4) 마지막에는 어떤 값에도 매칭되는 "else" 규칙을 하나 포함
+5) "reasoning"에는 경계값을 어떻게 정했는지 한국어로 2~3문장 설명
+
+반환 JSON 예:
+{
+  "rules":[
+    {"condition":"value >= 600","label":"앉아있음"},
+    {"condition":"value >= 400 && value < 600","label":"걷는중"},
+    {"condition":"else","label":"서있음"}
+  ],
+  "reasoning":"앉아있음은 대체로 600 이상, 걷기는 400~600 사이, 나머지는 서있음으로 구분했습니다."
 }
+`;
+
+        const raw = await this.generate(prompt, { temperature: 0.2, num_predict: 180 });
+        // 모델이 코드블록 등을 섞어 보낼 수도 있어 단순 정제
+        const match = raw.match(/\{[\s\S]*\}/);
+        const jsonStr = match ? match[0] : raw;
+        try {
+            const parsed = JSON.parse(jsonStr);
+            // 간단 검증
+            if (Array.isArray(parsed.rules) && parsed.reasoning) return parsed;
+            return { rules: [], reasoning: "규칙 생성 실패(형식 오류)" };
+        } catch(e){
+            return { rules: [], reasoning: "규칙 생성 실패(JSON 파싱 실패)" };
+        }
+    }
+}
+
+
 
 export default OllamaService;

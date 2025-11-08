@@ -4,7 +4,10 @@ import {
     generateCodeLine,
     finalizeCode,
     explainCode,
-    checkAIHealth
+    checkAIHealth,
+    trainRules,
+    getModel,
+    predictValue
 } from '../controllers/aiController.js';
 import { protect } from '../middleware/auth.js';
 
@@ -16,5 +19,8 @@ router.get('/health', checkAIHealth);
 router.post('/generate-code-line', generateCodeLine);
 router.post('/finalize-code', finalizeCode);
 router.post('/explain-code', explainCode);
+router.post('/train-rules', trainRules);
+router.get('/models/:id', getModel);
+router.post('/models/:id/predict', predictValue);
 
 export default router;
