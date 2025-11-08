@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LABIT - 코딩</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+
+    <style>
+        /* 코드 컨테이너 */
+        .code-container {
+            background: #1e1e1e !important;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            padding: 20px 20px 20px 60px;
+            border-radius: 8px;
+            overflow-x: auto;
+            max-height: 600px;
+            position: relative;
+            min-height: 400px;
+        }
+
+        /* Prism 스타일 오버라이드 */
+        .code-container pre[class*="language-"] {
+            margin: 0;
+            background: transparent;
+            padding: 0;
+        }
+
+        .code-container code[class*="language-"] {
+            background: transparent;
+            color: #d4d4d4;
+            text-shadow: none;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+
+        /* 줄번호 - 세로 정렬 */
+        .line-numbers {
+            position: absolute;
+            left: 0;
+            top: 0;
+            padding: 20px 10px;
+            color: #858585;
+            text-align: right;
+            user-select: none;
+            border-right: 1px solid #333;
+            width: 50px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .line-numbers div {
+            display: block;
+        }
+
+        /* 타이핑 커서 */
+        .typing-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1em;
+            background: #4f46e5;
+            animation: blink 1s infinite;
+            margin-left: 2px;
+            vertical-align: text-bottom;
+        }
+
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        /* AI 튜터 말풍선 - 코드 오른쪽 */
+        .ai-tutor-bubble {
+            position: sticky;     /* 코드 스크롤 시 상단에 붙어 있게 */
+            top: 0;
+            z-index: 10;
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px 24px;
+            /* 상단/하단 둥글림: 헤더 바로 아래에 붙어 자연스럽게 */
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            /* 카드 내부 간격 */
+            margin: 0;
+        }
+        .ai-tutor-bubble::before { display:none; }  /* 말풍선 꼬리 제거 */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                right: -350px;
+            }
+            to {
+                opacity: 1;
+                right: -320px;
+            }
+        }
+
+        /* 코드 패널을 감싸는 wrapper */
+        .code-panel-wrapper {
+            position: relative;
+        }
+
+        /* 반응형 - 작은 화면에서는 AI 튜터를 아래로 */
+        @media (max-width: 1400px) {
+            .code-panel-wrapper {
+                margin-right: 0;
+            }
+
+            .ai-tutor-bubble {
+                position: static;
+                transform: none;
+                width: 100%;
+                margin-top: 16px;
+            }
+
+            .ai-tutor-bubble::before {
+                display: none;
+            }
+        }
+
+        /* 로딩 애니메이션 */
+        .loading-dots::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+<!-- Header -->
+<header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="container mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-2xl font-bold text-indigo-600">LABIT</h1>
+                <span class="text-gray-300">|</span>
+                <span class="text-gray-800 font-semibold" id="kit-name">키트명</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="text-right">
+                    <p class="text-sm font-medium text-gray-700" id="user-name"></p>
+                </div>
+                <button id="logout-btn" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition">
+                    로그아웃
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Progress Bar -->
+<div class="bg-white border-b">
+    <div class="container mx-auto px-6 py-3">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2 opacity-50">
+                <div class="w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm">✓</div>
+                <span class="text-sm text-gray-500">브레인스토밍</span>
+            </div>
+            <div class="flex-1 h-1 bg-indigo-600 mx-4"></div>
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">4</div>
+                <span class="text-sm font-medium text-indigo-600">코딩</span>
+            </div>
+            <div class="flex-1 h-1 bg-gray-200 mx-4"></div>
+            <div class="flex items-center space-x-2 opacity-50">
+                <div class="w-8 h-8 bg-gray-300 text-white rounded-full flex items-center justify-center text-sm">5</div>
+                <span class="text-sm text-gray-500">AI 튜터</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<main class="container mx-auto px-6 py-8">
+    <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-3">질문에 답하면 AI가 코드를 작성합니다</h2>
+        <p class="text-gray-600">한 번에 하나씩 질문에 답변하고, "다음" 버튼을 누르면 코드가 생성됩니다</p>
+    </div>
+
+    <div id="alert-message" class="hidden mb-6"></div>
+    <div id="ollama-status" class="hidden mb-6"></div>
+
+    <!-- Progress -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between mb-2">
+            <span class="text-sm font-medium text-gray-700">진행 상황</span>
+            <span class="text-sm text-gray-500"><span id="current-question">0</span> / <span id="total-questions">0</span></span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+            <div id="progress-bar" class="bg-indigo-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+    </div>
+
+    <!-- Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Question Panel -->
+        <div>
+            <div class="bg-white rounded-xl shadow-md p-6 sticky top-24">
+                <div id="question-container">
+                    <!-- 질문이 여기에 표시됩니다 -->
+                </div>
+
+                <!-- Navigation -->
+                <div class="flex justify-between mt-6">
+                    <button id="prev-question-btn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition disabled:opacity-50" disabled>
+                        ← 이전
+                    </button>
+                    <button id="next-question-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:opacity-50" disabled>
+                        다음 →
+                    </button>
+                </div>
+
+                <button id="finish-btn" class="hidden w-full mt-4 px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition">
+                    ✓ 코드 완성하기
+                </button>
+            </div>
+        </div>
+
+        <!-- Code Panel with AI Tutor -->
+        <div class="code-panel-wrapper lg:col-span-2">
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <!-- Code Header -->
+                <div class="bg-gray-800 px-6 py-3 flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-green-400 font-mono text-sm">●</span>
+                        <span class="text-white font-semibold">Arduino Code</span>
+                    </div>
+                    <button id="copy-code-btn" class="hidden px-3 py-1 bg-gray-700 text-white text-sm rounded hover:bg-gray-600 transition">
+                        📋 복사
+                    </button>
+                </div>
+
+                <!-- AI Tutor Bubble -->
+                <div id="ai-tutor-bubble" class="ai-tutor-bubble hidden">
+                    <div class="flex items-start space-x-3 mb-2">
+                        <div class="flex-shrink-0">
+                            <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-2xl">
+                                🤖
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-sm mb-1">AI 튜터</p>
+                        </div>
+                    </div>
+                    <div id="ai-tutor-text" class="text-sm leading-relaxed">
+                        <!-- AI 설명이 여기에 표시됩니다 -->
+                    </div>
+                </div>
+
+                <!-- Code Display -->
+                <div id="code-display" class="code-container">
+                    <div class="text-gray-500 text-center py-12">
+                        <svg class="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                        </svg>
+                        <p>질문에 답변하고 "다음" 버튼을 누르세요</p>
+                    </div>
+                </div>
+
+                <!-- AI Thinking -->
+                <div id="ai-thinking" class="hidden bg-indigo-50 border-t border-indigo-200 px-6 py-3">
+                    <div class="flex items-center text-indigo-600">
+                        <div class="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mr-3"></div>
+                        <span class="text-sm">AI가 코드를 작성하는 중<span class="loading-dots"></span></span>
+                    </div>
+                </div>
+
+                <!-- Upload Button -->
+                <div class="border-t border-gray-200 px-6 py-4">
+                    <button id="upload-btn" class="w-full px-6 py-3 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-lg font-semibold hover:from-green-600 hover:to-teal-600 transition shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        📤 아두이노에 업로드
+                    </button>
+                    <p class="text-xs text-gray-500 text-center mt-2">코드를 완성하면 아두이노에 업로드할 수 있습니다</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="flex justify-between items-center mt-8">
+        <button id="back-btn" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition">
+            ← 이전 단계
+        </button>
+        <button id="next-step-btn" class="hidden px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition shadow-lg">
+            다음 단계로 →
+        </button>
+    </div>
+</main>
+
+<script type="module" src="../js/pages/step4-coding.js"></script>
+</body>
+</html>

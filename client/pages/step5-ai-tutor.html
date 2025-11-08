@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LABIT - AI 튜터</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+
+    <style>
+        .code-line {
+            padding: 8px 16px 8px 60px;
+            border-left: 3px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .code-line:hover {
+            background: #2d2d2d;
+            border-left-color: #4f46e5;
+        }
+
+        .code-line.active {
+            background: #2d2d2d;
+            border-left-color: #10b981;
+        }
+
+        .line-number {
+            position: absolute;
+            left: 10px;
+            color: #858585;
+            text-align: right;
+            width: 35px;
+            user-select: none;
+        }
+
+        .explanation-card {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .serial-monitor {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            padding: 16px;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .serial-line {
+            padding: 4px 0;
+            border-bottom: 1px solid #333;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+<!-- Header with Board/Port Settings -->
+<header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="container mx-auto px-6 py-4">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-2xl font-bold text-indigo-600">LABIT</h1>
+                <span class="text-gray-300">|</span>
+                <span class="text-gray-800 font-semibold" id="kit-name">키트명</span>
+            </div>
+
+            <!-- Board/Port Settings -->
+            <div class="flex items-center space-x-3">
+                <button id="board-setting-btn" class="px-4 py-2 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600 transition font-semibold shadow-md">
+                    보드 연결
+                </button>
+                <button id="port-setting-btn" class="px-4 py-2 bg-teal-500 text-white text-sm rounded-lg hover:bg-teal-600 transition font-semibold shadow-md">
+                    포트 설정
+                </button>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <div class="text-right">
+                    <p class="text-sm font-medium text-gray-700" id="user-name"></p>
+                </div>
+                <button id="logout-btn" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition">
+                    로그아웃
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Progress Bar -->
+<div class="bg-white border-b">
+    <div class="container mx-auto px-6 py-3">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2 opacity-50">
+                <div class="w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm">✓</div>
+                <span class="text-sm text-gray-500">코딩</span>
+            </div>
+            <div class="flex-1 h-1 bg-indigo-600 mx-4"></div>
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">5</div>
+                <span class="text-sm font-medium text-indigo-600">AI 튜터</span>
+            </div>
+            <div class="flex-1 h-1 bg-gray-200 mx-4"></div>
+            <div class="flex items-center space-x-2 opacity-50">
+                <div class="w-8 h-8 bg-gray-300 text-white rounded-full flex items-center justify-center text-sm">6</div>
+                <span class="text-sm text-gray-500">모니터링</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<main class="container mx-auto px-6 py-8">
+    <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-3">AI 튜터가 코드를 설명합니다</h2>
+        <p class="text-gray-600">각 코드 라인을 클릭하면 상세한 설명을 볼 수 있습니다</p>
+    </div>
+
+    <div id="alert-message" class="hidden mb-6"></div>
+
+    <!-- Layout: Code (Left) | Explanation (Right) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Code Panel (Left) -->
+        <div>
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="bg-gray-800 px-6 py-3 flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-green-400 font-mono text-sm">●</span>
+                        <span class="text-white font-semibold">코드</span>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="copy-code-btn" class="px-3 py-1 bg-gray-700 text-white text-sm rounded hover:bg-gray-600 transition">
+                            📋 복사
+                        </button>
+                        <button id="explain-all-btn" class="px-3 py-1 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700 transition">
+                            📖 전체 설명
+                        </button>
+                    </div>
+                </div>
+
+                <div id="code-lines" class="bg-[#1e1e1e] overflow-y-auto" style="max-height: 600px; font-family: 'Consolas', monospace; font-size: 14px; line-height: 1.6;">
+                    <!-- 코드 라인들이 여기에 표시됩니다 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Explanation Panel (Right) -->
+        <div>
+            <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl shadow-md p-6 sticky top-24" style="min-height: 600px;">
+                <div class="flex items-start space-x-4 mb-6">
+                    <div class="flex-shrink-0">
+                        <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-3xl shadow-lg">
+                            🤖
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-1">AI 튜터</h3>
+                        <p class="text-sm text-gray-600">코드를 클릭하면 설명을 들을 수 있어요</p>
+                    </div>
+                </div>
+
+                <div id="explanation-content" class="explanation-card">
+                    <div class="text-center py-12">
+                        <svg class="w-20 h-20 mx-auto mb-4 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                        <p class="text-gray-500">왼쪽의 코드 라인을 클릭해주세요</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Serial Monitor Section -->
+    <div class="mt-8">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="bg-gray-800 px-6 py-3 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <span class="text-green-400 font-mono text-sm">●</span>
+                    <span class="text-white font-semibold">시리얼 모니터 (미리보기)</span>
+                </div>
+                <button id="start-monitor-btn" class="px-4 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition font-semibold">
+                    ▶ 시작
+                </button>
+            </div>
+
+            <div id="serial-output" class="serial-monitor">
+                <div class="text-gray-500 text-center py-8">
+                    <p>아두이노를 연결하고 "시작" 버튼을 누르세요</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="flex justify-between items-center mt-8">
+        <button id="back-btn" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition">
+            ← 이전 단계
+        </button>
+        <button id="next-btn" class="px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition shadow-lg">
+            모니터링 시작 →
+        </button>
+    </div>
+</main>
+
+<!-- Settings Modal (same as step2-brainstorming.html) -->
+<div id="settings-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h3 id="modal-title" class="text-xl font-bold text-gray-800">보드/포트 설정</h3>
+            <button id="close-settings-modal" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">보드*</label>
+                <select id="board-select" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:outline-none">
+                    <option value="uno">Arduino Uno</option>
+                    <option value="nano">Arduino Nano</option>
+                    <option value="mega">Arduino Mega</option>
+                    <option value="leonardo">Arduino Leonardo</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">보드레이트*</label>
+                <select id="baudrate-select" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:outline-none">
+                    <option value="9600">9600</option>
+                    <option value="115200">115200</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">포트*</label>
+                <button id="scan-ports-btn" class="w-full px-4 py-3 bg-gray-100 border-2 border-gray-300 rounded-lg hover:bg-gray-200 transition text-center">
+                    <span>포트 검색 (선택)</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="flex space-x-3 mt-6">
+            <button id="cancel-settings-btn" class="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition">
+                취소
+            </button>
+            <button id="confirm-settings-btn" class="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition">
+                확인
+            </button>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="../js/pages/step5-ai-tutor.js"></script>
+</body>
+</html>
