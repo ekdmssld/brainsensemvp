@@ -3,6 +3,7 @@ import { API } from '../utils/api.js';
 import { Auth } from '../utils/auth.js';
 import { Storage } from '../utils/storage.js';
 import { showAlert } from '../utils/dom.js';
+import {SerialPortManager} from '../utils/serial.js';
 
 class HardwareDesignPage {
     constructor() {
@@ -22,6 +23,9 @@ class HardwareDesignPage {
         this.closeModalBtn = document.getElementById('close-modal');
         this.modalCancelBtn = document.getElementById('modal-cancel-btn');
         this.modalSelectBtn = document.getElementById('modal-select-btn');
+
+        this.serialManager = new SerialPortManager();
+        this.selectedPort = null;
 
         this.init();
     }
@@ -383,6 +387,7 @@ class HardwareDesignPage {
         this.backBtn.addEventListener('click', () => this.goBack());
         this.nextBtn.addEventListener('click', () => this.goNext());
         this.logoutBtn.addEventListener('click', () => Auth.logout());
+        this.setupSettingsModal();
     }
 
     goBack() {

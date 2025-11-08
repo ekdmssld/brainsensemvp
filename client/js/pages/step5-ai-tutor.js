@@ -3,6 +3,7 @@ import { API } from '../utils/api.js';
 import { Auth } from '../utils/auth.js';
 import { Storage } from '../utils/storage.js';
 import { showAlert } from '../utils/dom.js';
+import { SerialPortManager } from "../utils/serial.js";
 
 class AITutorPage {
     constructor() {
@@ -20,6 +21,8 @@ class AITutorPage {
         this.startMonitorBtn = document.getElementById('start-monitor-btn');
         this.backBtn = document.getElementById('back-btn');
         this.nextBtn = document.getElementById('next-btn');
+        this.serialManager = new SerialPortManager();
+        this.selectedPort = null;
 
         this.init();
     }
@@ -40,7 +43,6 @@ class AITutorPage {
         this.displayKitName();
         this.parseAndDisplayCode();
         this.setupEventListeners();
-        this.setupSettingsModal();
     }
 
     displayUserInfo() {
@@ -260,34 +262,115 @@ class AITutorPage {
         });
     }
 
+    // ⭐ 정리된 setupSettingsModal 메서드
     setupSettingsModal() {
+        // DOM 요소 가져오기
         const boardBtn = document.getElementById('board-setting-btn');
         const portBtn = document.getElementById('port-setting-btn');
         const modal = document.getElementById('settings-modal');
         const closeBtn = document.getElementById('close-settings-modal');
         const cancelBtn = document.getElementById('cancel-settings-btn');
         const confirmBtn = document.getElementById('confirm-settings-btn');
+        const scanPortsBtn = document.getElementById('scan-ports-btn');
+        const portInfo = document.getElementById('port-info');
+        const portName = document.getElementById('port-name');
+        const serialUnsupported = document.getElementById('serial-unsupported');
 
-        boardBtn?.addEventListener('click', () => {
-            document.getElementById('modal-title').textContent = '보드 설정';
-            modal.classList.remove('hidden');
-        });
+        // Web Serial API 지원 확인
+        if (!SerialPortManager.isSupported()) {
+            serialUnsupported?.classList.remove('hidden');
+            if (scanPortsBtn) {
+                scanPortsBtn.disabled = true;
+                scanPortsBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
 
-        portBtn?.addEventListener('click', () => {
-            document.getElementById('modal-title').textContent = '포트 설정';
-            modal.classList.remove('hidden');
-        });
+        // 보드 설정 버튼
+        if (boardBtn) {
+            boardBtn.addEventListener('click', () => {
+                document.getElementById('modal-title').textContent = '보드 설정';
+                modal.classList.remove('hidden');
+            });
+        }
 
-        closeBtn?.addEventListener('click', () => modal.classList.add('hidden'));
-        cancelBtn?.addEventListener('click', () => modal.classList.add('hidden'));
+        // 포트 설정 버튼
+        if (portBtn) {
+            portBtn.addEventListener('click', () => {
+                document.getElementById('modal-title').textContent = '포트 설정';
+                modal.classList.remove('hidden');
+            });
+        }
 
-        confirmBtn?.addEventListener('click', () => {
-            const board = document.getElementById('board-select').value;
-            const baudrate = document.getElementById('baudrate-select').value;
-            Storage.setItem('arduinoSettings', { board, baudrate });
-            showAlert('success', '설정이 저장되었습니다', 'alert-message');
-            modal.classList.add('hidden');
-        });
+        // 모달 닫기
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                modal.classList.add('hidden');
+            });
+        }
+
+        // 취소 버튼
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', () => {
+                modal.classList.add('hidden');
+            });
+        }
+
+        // 포트 검색 버튼
+        if (scanPortsBtn) {
+            scanPortsBtn.addEventListener('click', async () => {
+                scanPortsBtn.disabled = true;
+                scanPortsBtn.innerHTML = `
+                    <div class="flex items-center justify-center">
+                        <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                        <span>포트 검색 중...</span>
+                    </div>
+                `;
+
+                try {
+                    const result = await this.serialManager.requestPort();
+
+                    if (result.success) {
+                        this.selectedPort = result.port;
+                        const info = this.serialManager.getPortInfo();
+
+                        // 포트 정보 표시
+                        if (portInfo && portName) {
+                            portName.textContent = `포트 선택됨 (VID: ${info.usbVendorId || 'N/A'}, PID: ${info.usbProductId || 'N/A'})`;
+                            portInfo.classList.remove('hidden');
+                        }
+
+                        showAlert('success', '포트가 선택되었습니다', 'alert-message');
+                    } else {
+                        showAlert('warning', result.message, 'alert-message');
+                    }
+                } catch (error) {
+                    console.error('Port scan error:', error);
+                    showAlert('error', '포트 검색 중 오류가 발생했습니다', 'alert-message');
+                } finally {
+                    scanPortsBtn.disabled = false;
+                    scanPortsBtn.innerHTML = '🔍 포트 검색';
+                }
+            });
+        }
+
+        // 확인 버튼
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', () => {
+                const board = document.getElementById('board-select')?.value;
+                const baudrate = document.getElementById('baudrate-select')?.value;
+
+                const settings = {
+                    board,
+                    baudrate: parseInt(baudrate),
+                    port: this.selectedPort ? 'connected' : null,
+                    timestamp: new Date().toISOString()
+                };
+
+                Storage.setItem('arduinoSettings', settings);
+                showAlert('success', '설정이 저장되었습니다', 'alert-message');
+                modal.classList.add('hidden');
+            });
+        }
     }
 
     setupEventListeners() {
@@ -299,6 +382,9 @@ class AITutorPage {
             showAlert('success', '모든 단계를 완료했습니다!', 'alert-message');
         });
         document.getElementById('logout-btn').addEventListener('click', () => Auth.logout());
+
+        // ⭐ setupSettingsModal을 여기서 호출
+        this.setupSettingsModal();
     }
 }
 
