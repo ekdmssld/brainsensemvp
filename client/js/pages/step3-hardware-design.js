@@ -70,6 +70,7 @@ class HardwareDesignPage {
                 description: this.selectedKit.sensors?.[0]?.description || '압력을 감지하는 센서입니다',
                 pin: this.selectedKit.sensors?.[0]?.pin || 'A0',
                 icon: '📊',
+                image: '../assets/images/components/led.jpeg',
                 connections: [
                     { from: 'VCC', to: '5V', color: 'red' },
                     { from: 'GND', to: 'GND', color: 'black' },
@@ -94,6 +95,7 @@ class HardwareDesignPage {
                 description: '상태를 시각적으로 표시하는 발광 다이오드입니다',
                 pin: 'D7',
                 icon: '💡',
+                image: '../assets/images/components/led.jpeg',
                 connections: [
                     { from: 'Anode(+)', to: 'D7', color: 'red' },
                     { from: 'Cathode(-)', to: 'GND', color: 'black' }
@@ -116,6 +118,7 @@ class HardwareDesignPage {
                 description: '소리로 알림을 제공하는 부품입니다',
                 pin: 'D8',
                 icon: '🔊',
+                image: '../assets/images/components/led.jpeg',
                 connections: [
                     { from: 'Positive(+)', to: 'D8', color: 'red' },
                     { from: 'Negative(-)', to: 'GND', color: 'black' }
@@ -137,6 +140,7 @@ class HardwareDesignPage {
                 description: '무선 데이터 통신을 위한 블루투스 모듈입니다',
                 pin: 'D2, D3',
                 icon: '📡',
+                image: '../assets/images/components/led.jpeg',
                 connections: [
                     { from: 'VCC', to: '5V', color: 'red' },
                     { from: 'GND', to: 'GND', color: 'black' },
@@ -168,6 +172,7 @@ class HardwareDesignPage {
                     description: sensor.description,
                     pin: sensor.pin,
                     icon: '📊',
+                    image: '../assets/images/components/led.jpeg',
                     connections: [
                         { from: 'VCC', to: '5V', color: 'red' },
                         { from: 'GND', to: 'GND', color: 'black' },
@@ -306,6 +311,16 @@ class HardwareDesignPage {
         document.getElementById('modal-title').textContent = component.name;
         document.getElementById('modal-type').textContent = component.type;
         document.getElementById('modal-description').textContent = component.description;
+
+        // 이미지 표시
+        if (component.image) {
+            const modalImage = document.getElementById('modal-image');
+            modalImage.src = component.image;
+            modalImage.alt = component.name;
+            document.getElementById('modal-image-container').classList.remove('hidden');
+        } else {
+            document.getElementById('modal-image-container').classList.add('hidden');
+        }
 
         // 핀 연결 정보
         const pinsHtml = component.connections.map(conn => `
