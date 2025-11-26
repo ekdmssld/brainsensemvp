@@ -1,0 +1,106 @@
+{{>layouts/shop-header}}
+
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-body p-5">
+                <!-- 로고 -->
+                <div class="text-center mb-4">
+                    <h2><i class="bi bi-cpu text-primary"></i></h2>
+                    <h3>로그인</h3>
+                    <p class="text-muted">Arduino Shop에 오신 것을 환영합니다</p>
+                </div>
+
+                <!-- 에러 메시지 -->
+                {{#error}}
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bi bi-exclamation-circle"></i> {{error}}
+                    </div>
+                {{/error}}
+
+                <!-- 회원가입 성공 메시지 -->
+                {{#signup}}
+                    <div class="alert alert-success" role="alert">
+                        <i class="bi bi-check-circle"></i> 회원가입이 완료되었습니다. 로그인해주세요.
+                    </div>
+                {{/signup}}
+
+                <!-- 로그인 폼 -->
+                <form action="/login" method="post">
+                    <input type="hidden" name="_csrf" value="{{_csrf.token}}">
+
+                    {{#redirect}}
+                        <input type="hidden" name="redirect" value="{{redirect}}">
+                    {{/redirect}}
+
+                    <!-- 아이디 -->
+                    <div class="mb-3">
+                        <label for="username" class="form-label">
+                            <i class="bi bi-person"></i> 아이디
+                        </label>
+                        <input type="text" class="form-control" id="username" name="username"
+                               placeholder="아이디를 입력하세요" required autofocus>
+                    </div>
+
+                    <!-- 비밀번호 -->
+                    <div class="mb-3">
+                        <label for="password" class="form-label">
+                            <i class="bi bi-lock"></i> 비밀번호
+                        </label>
+                        <input type="password" class="form-control" id="password" name="password"
+                               placeholder="비밀번호를 입력하세요" required>
+                    </div>
+
+                    <!-- 자동 로그인 -->
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="remember-me" name="remember-me">
+                        <label class="form-check-label" for="remember-me">
+                            로그인 상태 유지
+                        </label>
+                    </div>
+
+                    <!-- 로그인 버튼 -->
+                    <div class="d-grid gap-2 mb-3">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-box-arrow-in-right"></i> 로그인
+                        </button>
+                    </div>
+                </form>
+
+                <!-- 구분선 -->
+                <div class="text-center my-3">
+                    <span class="text-muted">또는</span>
+                </div>
+
+                <!-- 소셜 로그인 -->
+                <div class="d-grid gap-2 mb-3">
+                    <a href="/oauth2/authorization/google" class="btn btn-outline-danger">
+                        <i class="bi bi-google"></i> Google로 로그인
+                    </a>
+                </div>
+
+                <!-- 링크 -->
+                <div class="text-center">
+                    <a href="/find-id" class="text-muted text-decoration-none me-3">
+                        <small>아이디 찾기</small>
+                    </a>
+                    <a href="/find-password" class="text-muted text-decoration-none me-3">
+                        <small>비밀번호 찾기</small>
+                    </a>
+                    <a href="/signup" class="text-primary text-decoration-none">
+                        <small><strong>회원가입</strong></small>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 비회원 주문조회 -->
+        <div class="text-center mt-3">
+            <a href="/order-tracking" class="text-muted text-decoration-none">
+                <i class="bi bi-search"></i> 비회원 주문조회
+            </a>
+        </div>
+    </div>
+</div>
+
+{{>layouts/shop-footer}}

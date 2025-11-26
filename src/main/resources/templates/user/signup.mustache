@@ -1,0 +1,147 @@
+{{>layouts/shop-header}}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-body p-5">
+                <!-- 헤더 -->
+                <div class="text-center mb-4">
+                    <h2><i class="bi bi-person-plus text-primary"></i></h2>
+                    <h3>회원가입</h3>
+                    <p class="text-muted">Arduino Shop 회원이 되어 다양한 혜택을 누리세요</p>
+                </div>
+
+                <!-- 에러 메시지 -->
+                {{#error}}
+                    <div class="alert alert-danger" role="alert">
+                        <i class="bi bi-exclamation-circle"></i> {{error}}
+                    </div>
+                {{/error}}
+
+                <!-- 회원가입 폼 -->
+                <form action="/signup" method="post" id="signupForm">
+                    <input type="hidden" name="_csrf" value="{{_csrf.token}}">
+
+                    <!-- 아이디 -->
+                    <div class="mb-3">
+                        <label for="username" class="form-label">
+                            <i class="bi bi-person"></i> 아이디 <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="username" name="username"
+                               placeholder="4-20자 영문, 숫자" required pattern="[a-zA-Z0-9]{4,20}"
+                               minlength="4" maxlength="20">
+                        <small class="form-text text-muted">4-20자의 영문 소문자, 숫자만 사용 가능합니다.</small>
+                    </div>
+
+                    <!-- 이메일 -->
+                    <div class="mb-3">
+                        <label for="email" class="form-label">
+                            <i class="bi bi-envelope"></i> 이메일 <span class="text-danger">*</span>
+                        </label>
+                        <input type="email" class="form-control" id="email" name="email"
+                               placeholder="example@email.com" required>
+                    </div>
+
+                    <!-- 비밀번호 -->
+                    <div class="mb-3">
+                        <label for="password" class="form-label">
+                            <i class="bi bi-lock"></i> 비밀번호 <span class="text-danger">*</span>
+                        </label>
+                        <input type="password" class="form-control" id="password" name="password"
+                               placeholder="8자 이상 영문, 숫자, 특수문자" required
+                               minlength="8" maxlength="20">
+                        <small class="form-text text-muted">8자 이상의 영문, 숫자, 특수문자를 조합하세요.</small>
+                    </div>
+
+                    <!-- 비밀번호 확인 -->
+                    <div class="mb-3">
+                        <label for="passwordConfirm" class="form-label">
+                            <i class="bi bi-lock-fill"></i> 비밀번호 확인 <span class="text-danger">*</span>
+                        </label>
+                        <input type="password" class="form-control" id="passwordConfirm" name="passwordConfirm"
+                               placeholder="비밀번호를 다시 입력하세요" required>
+                        <small id="passwordError" class="form-text text-danger" style="display: none;">
+                            비밀번호가 일치하지 않습니다.
+                        </small>
+                    </div>
+
+                    <!-- 전화번호 -->
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">
+                            <i class="bi bi-telephone"></i> 전화번호
+                        </label>
+                        <input type="tel" class="form-control" id="phone" name="phone"
+                               placeholder="010-1234-5678" pattern="[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}">
+                        <small class="form-text text-muted">형식: 010-1234-5678</small>
+                    </div>
+
+                    <!-- 주소 -->
+                    <div class="mb-3">
+                        <label for="address" class="form-label">
+                            <i class="bi bi-geo-alt"></i> 주소
+                        </label>
+                        <input type="text" class="form-control" id="address" name="address"
+                               placeholder="서울시 강남구">
+                    </div>
+
+                    <!-- 약관 동의 -->
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                            <label class="form-check-label" for="agreeTerms">
+                                <a href="/terms" target="_blank">이용약관</a> 및
+                                <a href="/privacy" target="_blank">개인정보처리방침</a>에 동의합니다.
+                                <span class="text-danger">*</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 버튼 -->
+                    <div class="d-grid gap-2 mb-3">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-person-plus"></i> 회원가입
+                        </button>
+                        <a href="/login" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> 로그인으로 돌아가기
+                        </a>
+                    </div>
+                </form>
+
+                <!-- 소셜 회원가입 -->
+                <div class="text-center mt-4">
+                    <p class="text-muted mb-2">소셜 계정으로 간편 가입</p>
+                    <a href="/oauth2/authorization/google" class="btn btn-outline-danger">
+                        <i class="bi bi-google"></i> Google 계정으로 가입
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 비밀번호 확인 검증
+    const password = document.getElementById('password');
+    const passwordConfirm = document.getElementById('passwordConfirm');
+    const passwordError = document.getElementById('passwordError');
+    const form = document.getElementById('signupForm');
+
+    passwordConfirm.addEventListener('input', function() {
+        if (password.value !== passwordConfirm.value) {
+            passwordError.style.display = 'block';
+            passwordConfirm.setCustomValidity('비밀번호가 일치하지 않습니다.');
+        } else {
+            passwordError.style.display = 'none';
+            passwordConfirm.setCustomValidity('');
+        }
+    });
+
+    form.addEventListener('submit', function(e) {
+        if (password.value !== passwordConfirm.value) {
+            e.preventDefault();
+            alert('비밀번호가 일치하지 않습니다.');
+        }
+    });
+</script>
+
+{{>layouts/shop-footer}}

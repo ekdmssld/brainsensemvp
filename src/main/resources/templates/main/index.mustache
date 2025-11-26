@@ -1,0 +1,146 @@
+{{>layouts/shop-header}}
+
+<div class="row">
+    <!-- 사이드바 (카테고리 & 최신 상품) -->
+    <div class="col-md-3">
+        <!-- 카테고리 -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-list-ul"></i> 카테고리</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="/products" class="list-group-item list-group-item-action {{^selectedCategoryId}}active{{/selectedCategoryId}}">
+                    전체상품
+                </a>
+                {{#categories}}
+                    <a href="/products?category={{id}}" class="list-group-item list-group-item-action">
+                    {{name}} ({{productCount}})
+                    </a>
+                    {{#children}}
+                        <a href="/products?category={{id}}" class="list-group-item list-group-item-action ps-4">
+                        └ {{name}} ({{productCount}})
+                        </a>
+                    {{/children}}
+                {{/categories}}
+            </div>
+        </div>
+
+        <!-- 최신 상품 -->
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h6 class="mb-0"><i class="bi bi-star"></i> 최신 상품</h6>
+            </div>
+            <div class="list-group list-group-flush">
+                {{#latestProducts}}
+                    <a href="/products/{{id}}" class="list-group-item list-group-item-action">
+                        <div class="d-flex align-items-center">
+                            {{#imageUrl}}
+                                <img src="{{imageUrl}}" alt="{{name}}" style="width: 50px; height: 50px; object-fit: cover;" class="me-2 rounded">
+                            {{/imageUrl}}
+                            {{^imageUrl}}
+                                <div style="width: 50px; height: 50px; background-color: #e9ecef;" class="me-2 rounded d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-image text-muted"></i>
+                                </div>
+                            {{/imageUrl}}
+                            <div class="flex-grow-1">
+                                <div class="small fw-bold text-truncate">{{name}}</div>
+                                <div class="small text-primary">{{formattedPrice}}</div>
+                            </div>
+                        </div>
+                    </a>
+                {{/latestProducts}}
+            </div>
+        </div>
+    </div>
+
+    <!-- 메인 상품 리스트 -->
+    <div class="col-md-9">
+        <!-- 헤더 -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                {{#selectedCategory}}
+                    <h3><i class="bi bi-tag"></i> {{name}}</h3>
+                    <p class="text-muted">{{description}}</p>
+                {{/selectedCategory}}
+                {{^selectedCategory}}
+                    {{#keyword}}
+                        <h3><i class="bi bi-search"></i> "{{keyword}}" 검색 결과</h3>
+                        <p class="text-muted">총 {{totalProducts}}개의 상품이 검색되었습니다.</p>
+                    {{/keyword}}
+                    {{^keyword}}
+                        <h3><i class="bi bi-shop"></i> 전체 상품</h3>
+                        <p class="text-muted">아두이노 부품 및 키트</p>
+                    {{/keyword}}
+                {{/selectedCategory}}
+            </div>
+        </div>
+
+        <!-- 상품 그리드 -->
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {{#products}}
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <a href="/products/{{id}}" class="text-decoration-none">
+                            {{#imageUrl}}
+                                <img src="{{imageUrl}}" class="card-img-top" alt="{{name}}" style="height: 200px; object-fit: cover;">
+                            {{/imageUrl}}
+                            {{^imageUrl}}
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                                </div>
+                            {{/imageUrl}}
+                            <div class="card-body">
+                                <h6 class="card-title text-dark">{{name}}</h6>
+                                <p class="card-text text-muted small text-truncate">{{description}}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="h5 text-primary mb-0">{{formattedPrice}}</span>
+                                    <small class="text-muted">{{stockStatus}}</small>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="card-footer bg-white border-top-0">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-sm btn-outline-danger" onclick="requireLogin(event)">
+                                    <i class="bi bi-heart"></i> 위시리스트
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {{/products}}
+
+            {{^products}}
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        <i class="bi bi-exclamation-circle"></i> 상품이 없습니다.
+                    </div>
+                </div>
+            {{/products}}
+        </div>
+
+        <!-- 페이징 -->
+        {{#totalPages}}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {{#hasPrev}}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{prevPage}}{{#selectedCategoryId}}&category={{selectedCategoryId}}{{/selectedCategoryId}}">이전</a>
+                        </li>
+                    {{/hasPrev}}
+
+                    <li class="page-item active">
+                        <span class="page-link">{{currentPageDisplay}}</span>
+                    </li>
+
+                    {{#hasNext}}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{nextPage}}{{#selectedCategoryId}}&category={{selectedCategoryId}}{{/selectedCategoryId}}">다음</a>
+                        </li>
+                    {{/hasNext}}
+                </ul>
+            </nav>
+        {{/totalPages}}
+    </div>
+</div>
+
+{{>layouts/shop-footer}}
