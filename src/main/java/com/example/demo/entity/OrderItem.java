@@ -11,63 +11,42 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-@Table(name = "order_items")
 public class OrderItem {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
-    private Order order; // 주문
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private User member; // 주문자
+    private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
-    private Product product; // 상품
+    private Product product;
 
-    @Column(nullable = false)
-    private Integer quantity; // 수량
+    private Integer quantity;     // 수량
+    private Integer price;        // 단가
+    private Integer totalPrice;   // price * quantity
 
-    @Column(nullable = false)
-    private Integer price; // 주문 가격 (주문 당시의 상품 가격)
+    // ---------------------
+    // ★ 주문 아이템 생성 메서드 (프로젝트 전체에서 이것만 사용)
+    // ---------------------
+    public static OrderItem createOrderItem(Order order, Product product, int quantity, int price) {
+        OrderItem item = OrderItem.builder()
+                .order(order)
+                .product(product)
+                .quantity(quantity)
+                .price(price)
+                .totalPrice(price * quantity)
+                .build();
 
-    @Column(updatable = false)
-    @Builder.Default
-    private LocalDateTime createdAt = LocalDateTime.now(); // 생성일
+        return item;
+    }
 
-    // 비즈니스 메서드
+    // ---------------------
+    // ★ Order ←→ OrderItem 양방향 연결 setter
+    // ---------------------
     public void setOrder(Order order) {
         this.order = order;
-    }
-
-    public int getTotalPrice() {
-        return this.price * this.quantity;
-    }
-
-    public static OrderItem createOrderItem(User member, Product product, int quantity) {
-        // 재고 확인
-        if (product.getStockQuantity() < quantity) {
-            throw new IllegalStateException("재고가 부족합니다. 상품: " + product.getName());
-        }
-
-        // 재고 차감
-        product.removeStock(quantity);
-
-        return OrderItem.builder()
-                .member(member)
-                .product(product)
-                .price(product.getPrice())
-                .quantity(quantity)
-                .build();
-    }
-
-    public void cancel() {
-        // 재고 복구
-        this.product.addStock(this.quantity);
     }
 }

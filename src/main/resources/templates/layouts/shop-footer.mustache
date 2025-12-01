@@ -52,3 +52,46 @@
         return true;
     }
 </script>
+
+<!-- Bootstrap Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Toast 알림 -->
+<script>
+    // URL 파라미터에서 success 메시지 확인
+    const urlParams = new URLSearchParams(window.location.search);
+    const success = urlParams.get('success');
+
+    let message = '';
+    if (success === 'cart_added') {
+        message = '장바구니에 추가되었습니다!';
+    } else if (success === 'wishlist_added') {
+        message = '위시리스트에 추가되었습니다!';
+    } else if (success === 'wishlist_removed') {
+        message = '위시리스트에서 제거되었습니다!';
+    } else if (success === 'removed') {
+        message = '삭제되었습니다!';
+    }
+
+    if (message) {
+        // Bootstrap Alert 표시
+        const alertHtml = `
+            <div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 9999; margin-top: 20px;">
+                <div class="alert alert-success alert-dismissible fade show shadow-lg" role="alert">
+                    <i class="bi bi-check-circle-fill"></i> ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('afterbegin', alertHtml);
+
+        // 3초 후 자동 제거
+        setTimeout(() => {
+            const alert = document.querySelector('.alert');
+            if (alert) {
+                alert.classList.remove('show');
+                setTimeout(() => alert.remove(), 150);
+            }
+        }, 3000);
+    }
+</script>

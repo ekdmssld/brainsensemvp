@@ -3,15 +3,18 @@ package com.example.demo.controller;
 import com.example.demo.dto.AddUserRequest;
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequiredArgsConstructor
@@ -24,19 +27,30 @@ public class UserController {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @GetMapping("/login")
-    public String loginPage(@RequestParam(value = "error", required = false) String error,
-                            @RequestParam(value = "redirect", required = false) String redirect,
-                            Model model) {
-        log.info("로그인 페이지 접근");
+    public String loginPage(
+            @RequestParam(value = "error", required = false) String error,
+            @RequestParam(value = "signup", required = false) String signup,
+            @RequestParam(value = "redirect", required = false) String redirect,
+            Model model,
+            HttpServletRequest request) {
+
+        CsrfToken token = (CsrfToken) request.getAttribute("_csrf");
+
+        model.addAttribute("csrfToken", token.getToken());
+        model.addAttribute("csrfParameterName", token.getParameterName());
 
         if (error != null) {
             model.addAttribute("error", "아이디 또는 비밀번호가 올바르지 않습니다.");
         }
 
+        if (signup != null && signup.equals("success")) {
+            model.addAttribute("signup", true);
+        }
+
         if (redirect != null) {
             model.addAttribute("redirect", redirect);
         }
-        model.addAttribute("keyword", "");
+
         return "user/login";
     }
 
@@ -45,10 +59,15 @@ public class UserController {
      * GET /signup
      */
     @GetMapping("/signup")
-    public String signupPage() {
-        log.info("회원가입 페이지 접근");
+    public String signupPage(HttpServletRequest request, Model model) {
+        CsrfToken token = (CsrfToken) request.getAttribute("_csrf");
+
+        model.addAttribute("csrfToken", token.getToken());
+        model.addAttribute("csrfParameterName", token.getParameterName());
+
         return "user/signup";
     }
+
 
     /**
      * 회원가입 처리
@@ -56,7 +75,7 @@ public class UserController {
      */
     @PostMapping("/signup")
     public String signup(AddUserRequest request, Model model) {
-        log.info("회원가입 요청 - username: {}", request.getUsername());
+        log.info("회원가입 요청 - username: {}, email: {}", request.getUsername(), request.getEmail());
 
         try {
             // 중복 체크
@@ -73,19 +92,20 @@ public class UserController {
             // 비밀번호 암호화
             String encodedPassword = bCryptPasswordEncoder.encode(request.getPassword());
 
-            // 사용자 생성
+            // ❌ 첫 번째 사용자 ADMIN 로직 제거
+            // 일반 사용자로 생성
             User user = User.builder()
                     .username(request.getUsername())
                     .email(request.getEmail())
                     .password(encodedPassword)
                     .phone(request.getPhone())
                     .address(request.getAddress())
-                    .role(User.Role.USER)
+                    .role(User.Role.USER)  // ✅ 기본은 USER
                     .build();
 
             userRepository.save(user);
 
-            log.info("회원가입 성공 - username: {}", request.getUsername());
+            log.info("회원가입 성공 - username: {}, role: USER", request.getUsername());
             return "redirect:/login?signup=success";
 
         } catch (Exception e) {
@@ -93,5 +113,10 @@ public class UserController {
             model.addAttribute("error", "회원가입 중 오류가 발생했습니다.");
             return "user/signup";
         }
+    }
+    @GetMapping("/test/encode-password")
+    @ResponseBody
+    public String testEncodePassword(@RequestParam String password) {
+        return bCryptPasswordEncoder.encode(password);
     }
 }

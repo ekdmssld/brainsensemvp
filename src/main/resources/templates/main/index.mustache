@@ -14,11 +14,11 @@
                 </a>
                 {{#categories}}
                     <a href="/products?category={{id}}" class="list-group-item list-group-item-action">
-                    {{name}} ({{productCount}})
+                    {{name}}
                     </a>
                     {{#children}}
                         <a href="/products?category={{id}}" class="list-group-item list-group-item-action ps-4">
-                        └ {{name}} ({{productCount}})
+                        └ {{name}}
                         </a>
                     {{/children}}
                 {{/categories}}
@@ -124,17 +124,17 @@
                 <ul class="pagination justify-content-center">
                     {{#hasPrev}}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{prevPage}}{{#selectedCategoryId}}&category={{selectedCategoryId}}{{/selectedCategoryId}}">이전</a>
+                            <a class="page-link" href="?page={{prevPage}}{{#selectedCategoryId}}&category={{selectedCategoryId}}{{/selectedCategoryId}}{{#keyword}}&search={{keyword}}{{/keyword}}">이전</a>
                         </li>
                     {{/hasPrev}}
 
                     <li class="page-item active">
-                        <span class="page-link">{{currentPageDisplay}}</span>
+                        <span class="page-link">{{currentPage}}</span>
                     </li>
 
                     {{#hasNext}}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{nextPage}}{{#selectedCategoryId}}&category={{selectedCategoryId}}{{/selectedCategoryId}}">다음</a>
+                            <a class="page-link" href="?page={{nextPage}}{{#selectedCategoryId}}&category={{selectedCategoryId}}{{/selectedCategoryId}}{{#keyword}}&search={{keyword}}{{/keyword}}">다음</a>
                         </li>
                     {{/hasNext}}
                 </ul>

@@ -1,0 +1,72 @@
+{{>layouts/shop-header}}
+
+<div class="row">
+    <!-- 사이드바 -->
+    <div class="col-md-2">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-shield-lock"></i> 관리자</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="/admin" class="list-group-item list-group-item-action">
+                    <i class="bi bi-speedometer2"></i> 대시보드
+                </a>
+                <a href="/admin/products" class="list-group-item list-group-item-action">
+                    <i class="bi bi-box"></i> 상품 관리
+                </a>
+                <a href="/admin/orders" class="list-group-item list-group-item-action">
+                    <i class="bi bi-cart"></i> 주문 관리
+                </a>
+                <a href="/admin/users" class="list-group-item list-group-item-action active">
+                    <i class="bi bi-people"></i> 회원 관리
+                </a>
+                <a href="/" class="list-group-item list-group-item-action">
+                    <i class="bi bi-house"></i> 메인으로
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 회원 목록 -->
+    <div class="col-md-10">
+        <h2><i class="bi bi-people"></i> 회원 관리</h2>
+        <hr>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>아이디</th>
+                            <th>이메일</th>
+                            <th>전화번호</th>
+                            <th>권한</th>
+                            <th>가입일</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{#users}}
+                            <tr>
+                                <td>{{id}}</td>
+                                <td>{{username}}</td>
+                                <td>{{email}}</td>
+                                <td>{{phone}}</td>
+                                <td>
+                                    {{#role}}
+                                        <span class="badge bg-danger">{{role}}</span>
+                                    {{/role}}
+                                </td>
+                                <td>{{createdAt}}</td>
+                            </tr>
+                        {{/users}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{>layouts/shop-footer}}

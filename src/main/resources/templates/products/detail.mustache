@@ -1,160 +1,195 @@
 {{>layouts/shop-header}}
 
-<div class="row">
-    <div class="col-md-6">
-        <!-- 상품 이미지 -->
-        <div class="card">
-            {{#product.imageUrl}}
-                <img src="{{product.imageUrl}}" class="card-img-top" alt="{{product.name}}" style="max-height: 500px; object-fit: contain;">
-            {{/product.imageUrl}}
-            {{^product.imageUrl}}
-                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 500px;">
-                    <i class="bi bi-image text-muted" style="font-size: 5rem;"></i>
-                </div>
-            {{/product.imageUrl}}
-        </div>
+<div class="container mt-4">
+    <!-- 뒤로가기 -->
+    <div class="mb-3">
+        <a href="/products" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> 목록으로
+        </a>
     </div>
 
-    <div class="col-md-6">
+    <!-- 성공 메시지 -->
+    {{#successMessage}}
+        <div class="alert alert-success alert-dismissible fade show">
+            {{successMessage}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {{/successMessage}}
+
+    <div class="row">
+        <!-- 상품 이미지 -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body p-0">
+                    {{#product.imageUrl}}
+                        <img src="{{product.imageUrl}}" alt="{{product.name}}"
+                             class="img-fluid w-100" style="max-height: 500px; object-fit: contain;">
+                    {{/product.imageUrl}}
+                    {{^product.imageUrl}}
+                        <div style="height: 500px; background-color: #e9ecef;"
+                             class="d-flex align-items-center justify-content-center">
+                            <i class="bi bi-image" style="font-size: 6rem; color: #adb5bd;"></i>
+                        </div>
+                    {{/product.imageUrl}}
+                </div>
+            </div>
+        </div>
+
         <!-- 상품 정보 -->
-        <h2>{{product.name}}</h2>
-        <hr>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <!-- 카테고리 -->
+                    <p class="text-muted mb-2">
+                        <i class="bi bi-tag"></i> {{product.categoryName}}
+                    </p>
 
-        <div class="mb-4">
-            <span class="badge bg-primary">{{product.categoryName}}</span>
-            {{#product.manufacturer}}
-                <span class="badge bg-secondary">{{product.manufacturer}}</span>
-            {{/product.manufacturer}}
-        </div>
+                    <!-- 상품명 -->
+                    <h2 class="mb-3">{{product.name}}</h2>
 
-        <div class="mb-4">
-            <h3 class="text-primary">{{product.formattedPrice}}</h3>
-            <p class="text-muted">
-                <i class="bi bi-box-seam"></i> 재고: <strong>{{product.stockStatus}}</strong>
-                {{#product.stock}}
-                    ({{product.stock}}개)
-                {{/product.stock}}
-            </p>
-        </div>
+                    <!-- 제조사/모델 -->
+                    {{#product.manufacturer}}
+                        <p class="text-muted">
+                            <strong>제조사:</strong> {{product.manufacturer}}
+                            {{#product.modelNumber}} / <strong>모델:</strong> {{product.modelNumber}}{{/product.modelNumber}}
+                        </p>
+                    {{/product.manufacturer}}
 
-        <!-- 상품 설명 -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="mb-0"><i class="bi bi-info-circle"></i> 상품 설명</h5>
-            </div>
-            <div class="card-body">
-                <p>{{product.description}}</p>
+                    <!-- 가격 -->
+                    <div class="mb-4">
+                        <h3 class="text-primary fw-bold">{{product.formattedPrice}}</h3>
+                    </div>
 
-                {{#product.manufacturer}}
-                    <p class="mb-1"><strong>제조사:</strong> {{product.manufacturer}}</p>
-                {{/product.manufacturer}}
+                    <!-- 재고 상태 -->
+                    <div class="mb-4">
+                        {{#product.hasStock}}
+                            <span class="badge bg-success fs-6">
+                            <i class="bi bi-check-circle"></i> 재고 있음 ({{product.stock}}개)
+                        </span>
+                        {{/product.hasStock}}
+                        {{^product.hasStock}}
+                            <span class="badge bg-danger fs-6">
+                            <i class="bi bi-x-circle"></i> 품절
+                        </span>
+                        {{/product.hasStock}}
+                    </div>
 
-                {{#product.modelNumber}}
-                    <p class="mb-0"><strong>모델번호:</strong> {{product.modelNumber}}</p>
-                {{/product.modelNumber}}
-            </div>
-        </div>
+                    <!-- 수량 선택 및 장바구니 -->
+                    {{#product.hasStock}}
 
-        <!-- 구매 옵션 -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <div class="mb-3">
-                    <label for="quantity" class="form-label">수량</label>
-                    <div class="input-group" style="max-width: 150px;">
-                        <button class="btn btn-outline-secondary" type="button" onclick="decreaseQuantity()">-</button>
-                        <input type="number" class="form-control text-center" id="quantity" value="1" min="1" max="{{product.stock}}">
-                        <button class="btn btn-outline-secondary" type="button" onclick="increaseQuantity()">+</button>
+                        {{#user}}
+                            <!-- ✅ 로그인 된 경우: 실제 장바구니 form 전송 -->
+                            <form action="/cart/add" method="post" id="cartForm">
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                                <input type="hidden" name="productId" value="{{product.id}}">
+
+                                <div class="mb-4">
+                                    <label for="quantity" class="form-label fw-bold">수량</label>
+                                    <div class="input-group" style="max-width: 200px;">
+                                        <button type="button" class="btn btn-outline-secondary" onclick="decreaseQuantity()">
+                                            <i class="bi bi-dash"></i>
+                                        </button>
+                                        <input type="number" class="form-control text-center" id="quantity" name="quantity"
+                                               value="1" min="1" max="{{product.stock}}" required>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="increaseQuantity()">
+                                            <i class="bi bi-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="d-grid gap-2 mb-3">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="bi bi-cart-plus"></i> 장바구니 담기
+                                    </button>
+                                </div>
+                            </form>
+                        {{/user}}
+
+                        {{^user}}
+                            <!-- ❌ 로그인 안 된 경우: 클릭 시 로그인 페이지로 이동 -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">수량</label>
+                                <div class="input-group" style="max-width: 200px;">
+                                    <!-- 그냥 보여만 주고 동작은 없음 (원하면 disabled 처리도 가능) -->
+                                    <input type="number" class="form-control text-center"
+                                           value="1" min="1" max="{{product.stock}}" disabled>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 mb-3">
+                                <a href="/login" class="btn btn-primary btn-lg">
+                                <i class="bi bi-cart-plus"></i> 로그인 후 이용 가능
+                                </a>
+                            </div>
+                        {{/user}}
+
+                    {{/product.hasStock}}
+
+
+                    <!-- 위시리스트 버튼 -->
+                    <div class="d-grid gap-2">
+                        {{#user}}
+                            {{#isInWishlist}}
+                                <form action="/wishlist/remove/{{product.id}}" method="post">
+                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>  <!-- ✅ 추가 -->
+                                    <input type="hidden" name="redirect" value="detail">
+                                    <button type="submit" class="btn btn-outline-danger w-100">
+                                        <i class="bi bi-heart-fill"></i> 위시리스트에서 제거
+                                    </button>
+                                </form>
+                            {{/isInWishlist}}
+                            {{^isInWishlist}}
+                                <form action="/wishlist/add/{{product.id}}" method="post">
+                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>  <!-- ✅ 추가 -->
+                                    <button type="submit" class="btn btn-outline-primary w-100">
+                                        <i class="bi bi-heart"></i> 위시리스트에 추가
+                                    </button>
+                                </form>
+                            {{/isInWishlist}}
+                        {{/user}}
+                        {{^user}}
+                            <a href="/login" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-lock"></i> 로그인 후 이용 가능
+                            </a>
+                        {{/user}}
                     </div>
                 </div>
-
-                <div class="d-grid gap-2">
-                    <button class="btn btn-primary btn-lg" onclick="requireLogin(event); addToCart({{product.id}});">
-                        <i class="bi bi-cart-plus"></i> 장바구니 담기
-                    </button>
-                    <button class="btn btn-outline-danger" onclick="requireLogin(event); addToWishlist({{product.id}});">
-                        <i class="bi bi-heart"></i> 위시리스트
-                    </button>
-                    <a href="/products" class="btn btn-outline-secondary">
-                        <i class="bi bi-list"></i> 목록으로
-                    </a>
-                </div>
             </div>
-        </div>
-
-        <!-- 안내 사항 -->
-        <div class="alert alert-info">
-            <h6><i class="bi bi-truck"></i> 배송 안내</h6>
-            <ul class="mb-0 small">
-                <li>평일 오후 2시 이전 주문 시 당일 발송</li>
-                <li>배송비 3,000원 (30,000원 이상 무료배송)</li>
-                <li>제주/도서산간 지역 추가 배송비 발생</li>
-            </ul>
         </div>
     </div>
-</div>
 
-<!-- 상세 정보 탭 -->
-<div class="row mt-5">
-    <div class="col-12">
-        <ul class="nav nav-tabs" id="productTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="detail-tab" data-bs-toggle="tab" data-bs-target="#detail" type="button">
-                    상세정보
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="review-tab" data-bs-toggle="tab" data-bs-target="#review" type="button">
-                    리뷰
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="qna-tab" data-bs-toggle="tab" data-bs-target="#qna" type="button">
-                    Q&A
-                </button>
-            </li>
-        </ul>
-        <div class="tab-content border border-top-0 p-4" id="productTabContent">
-            <div class="tab-pane fade show active" id="detail" role="tabpanel">
-                <h5>상세 정보</h5>
-                <p>{{product.description}}</p>
-            </div>
-            <div class="tab-pane fade" id="review" role="tabpanel">
-                <h5>상품 리뷰</h5>
-                <p class="text-muted">등록된 리뷰가 없습니다.</p>
-            </div>
-            <div class="tab-pane fade" id="qna" role="tabpanel">
-                <h5>상품 문의</h5>
-                <p class="text-muted">등록된 문의가 없습니다.</p>
+    <!-- 상품 설명 -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h4 class="mb-0"><i class="bi bi-file-text"></i> 상품 설명</h4>
+                </div>
+                <div class="card-body">
+                    <p style="white-space: pre-wrap; line-height: 1.8;">{{product.description}}</p>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
+    const maxStock = {{product.stock}};
+
     function increaseQuantity() {
         const input = document.getElementById('quantity');
-        const max = parseInt(input.max);
-        const current = parseInt(input.value);
-        if (current < max) {
-            input.value = current + 1;
+        const currentValue = parseInt(input.value);
+        if (currentValue < maxStock) {
+            input.value = currentValue + 1;
         }
     }
 
     function decreaseQuantity() {
         const input = document.getElementById('quantity');
-        const current = parseInt(input.value);
-        if (current > 1) {
-            input.value = current - 1;
+        const currentValue = parseInt(input.value);
+        if (currentValue > 1) {
+            input.value = currentValue - 1;
         }
-    }
-
-    function addToCart(productId) {
-        const quantity = document.getElementById('quantity').value;
-        alert(`상품을 장바구니에 담았습니다. (수량: ${quantity})`);
-    }
-
-    function addToWishlist(productId) {
-        alert('위시리스트에 추가되었습니다.');
     }
 </script>
 

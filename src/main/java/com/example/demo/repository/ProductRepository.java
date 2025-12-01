@@ -11,6 +11,10 @@ import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
+    //페이징
+    Page<Product> findByNameContaining(String keyword, Pageable pageable);
+    Page<Product> findByCategory(Category category, Pageable pageable);
+
     // 카테고리별 상품 조회
     List<Product> findByCategory(Category category);
 
@@ -35,4 +39,17 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // 최신 상품 조회 (created_at 기준)
     @Query("SELECT p FROM Product p WHERE p.isAvailable = true ORDER BY p.createdAt DESC")
     List<Product> findLatestProducts(Pageable pageable);
+
+    Page<Product> findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
+            String nameKeyword,
+            String descriptionKeyword,
+            Pageable pageable
+    );
+
+    // 카테고리별 상품 조회
+    Page<Product> findByCategoryId(Long categoryId, Pageable pageable);
+
+    // 검색 + 카테고리
+    Page<Product> findByNameContainingAndCategoryId(String name, Long categoryId, Pageable pageable);
+
 }

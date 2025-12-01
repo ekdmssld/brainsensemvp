@@ -1,6 +1,5 @@
 package com.example.demo.entity;
 
-import com.example.demo.entity.Product;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,24 +32,41 @@ public class Cart {
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    // 비즈니스 메서드
-    public void updateQuantity(int quantity) {
+    // 수량 변경
+    public void changeQuantity(Integer quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("수량은 1개 이상이어야 합니다.");
+        }
+        if (quantity > product.getStockQuantity()) {
+            throw new IllegalArgumentException("재고가 부족합니다.");
+        }
         this.quantity = quantity;
     }
 
-    public void addQuantity(int quantity) {
-        this.quantity += quantity;
+    // 수량 증가
+    public void addQuantity(Integer amount) {
+        this.quantity += amount;
+        if (this.quantity > product.getStockQuantity()) {
+            throw new IllegalArgumentException("재고가 부족합니다.");
+        }
     }
 
-    public int getTotalPrice() {
+    // 총 금액 계산
+    public Integer getTotalPrice() {
         return this.product.getPrice() * this.quantity;
     }
 
-    public static Cart createCart(User member, Product product, int quantity) {
+    // 정적 팩토리 메서드
+    public static Cart createCart(User member, Product product, Integer quantity) {
+        if (quantity > product.getStockQuantity()) {
+            throw new IllegalArgumentException("재고가 부족합니다.");
+        }
+
         return Cart.builder()
                 .member(member)
                 .product(product)
                 .quantity(quantity)
+                .createdAt(LocalDateTime.now())
                 .build();
     }
 }

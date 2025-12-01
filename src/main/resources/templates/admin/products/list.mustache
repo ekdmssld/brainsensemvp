@@ -1,0 +1,107 @@
+{{>layouts/shop-header}}
+
+<div class="container mt-4">
+    {{#isSuccess}}
+        <div class="alert alert-success">{{message}}</div>
+    {{/isSuccess}}
+
+    {{#isDanger}}
+        <div class="alert alert-danger">{{message}}</div>
+    {{/isDanger}}
+
+    <h2 class="mb-4 fw-bold">상품 관리</h2>
+
+    <!-- 검색 및 카테고리 필터 -->
+    <form class="row g-2 mb-3" method="get" action="/admin/products">
+        <div class="col-md-4">
+            <input type="text" name="search" class="form-control" placeholder="상품명 검색"
+                   value="{{search}}">
+        </div>
+
+        <div class="col-md-3">
+            <select name="categoryId" class="form-select">
+                <option value="">전체 카테고리</option>
+
+                {{#categories}}
+                    <option value="{{id}}" {{#selected}}selected{{/selected}}>{{name}}</option>
+                {{/categories}}
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary w-100">검색</button>
+        </div>
+
+        <div class="col-md-2">
+            <a href="/admin/products/new" class="btn btn-success w-100">
+                + 상품 등록
+            </a>
+        </div>
+    </form>
+
+    <!-- 상품 목록 테이블 -->
+    <table class="table table-bordered align-middle text-center">
+        <thead class="table-light">
+        <tr>
+            <th>ID</th>
+            <th>이미지</th>
+            <th>상품명</th>
+            <th>가격</th>
+            <th>재고</th>
+            <th>상태</th>
+            <th>관리</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {{#products.content}}
+            <tr>
+                <td>{{id}}</td>
+
+                <td>
+                    {{#imageUrl}}
+                        <img src="{{imageUrl}}" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;">
+                    {{/imageUrl}}
+                    {{^imageUrl}}
+                        <span class="text-muted">No Image</span>
+                    {{/imageUrl}}
+                </td>
+
+                <td>
+                    <a href="/admin/products/{{id}}">{{name}}</a>
+                </td>
+
+                <td>{{formattedPrice}}</td>
+                <td>{{stock}}</td>
+
+                <td>
+                    {{#isAvailable}}
+                        <span class="badge bg-success">판매중</span>
+                    {{/isAvailable}}
+                    {{^isAvailable}}
+                        <span class="badge bg-secondary">비활성</span>
+                    {{/isAvailable}}
+                </td>
+
+                <td>
+                    <a href="/admin/products/{{id}}/edit" class="btn btn-sm btn-warning">수정</a>
+
+                    <form action="/admin/products/{{id}}/delete" method="post" style="display: inline;">
+                        <button class="btn btn-sm btn-danger"
+                                onclick="return confirm('정말 삭제하시겠습니까?');">
+                            삭제
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        {{/products.content}}
+
+        {{^products.content}}
+            <tr><td colspan="7">등록된 상품이 없습니다.</td></tr>
+        {{/products.content}}
+        </tbody>
+    </table>
+
+</div>
+
+{{>layouts/shop-footer}}

@@ -6,7 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.text.NumberFormat;
 import java.time.LocalDateTime;
+import java.util.Locale;
 
 @Getter
 @NoArgsConstructor
@@ -33,7 +35,7 @@ public class ProductDTO {
                 .price(product.getPrice())
                 .description(product.getDescription())
                 .imageUrl(product.getImageUrl())
-                .stock(product.getStock())
+                .stock(product.getStockQuantity())
                 .categoryName(product.getCategory().getId())
                 .manufacturer(product.getManufacturer())
                 .modelNumber(product.getModelNumber())
@@ -42,11 +44,11 @@ public class ProductDTO {
                 .build();
     }
 
-    public String getFormattedPrice(){
-        if(stock == null || stock == 0)
-            return "품절";
-        else if (stock < 5)
-            return "재고 부족";
-        return "재고 있음";
+    public String getFormattedPrice() {
+        NumberFormat formatter = NumberFormat.getNumberInstance(Locale.KOREA);
+        return formatter.format(price) + "원";
+    }
+    public boolean hasStock() {
+        return stock != null && stock > 0;
     }
 }

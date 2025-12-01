@@ -25,13 +25,8 @@
                     </div>
                 {{/signup}}
 
-                <!-- 로그인 폼 -->
                 <form action="/login" method="post">
-                    <input type="hidden" name="_csrf" value="{{_csrf.token}}">
-
-                    {{#redirect}}
-                        <input type="hidden" name="redirect" value="{{redirect}}">
-                    {{/redirect}}
+                    <input type="hidden" name="{{csrfParameterName}}" value="{{csrfToken}}">
 
                     <!-- 아이디 -->
                     <div class="mb-3">
@@ -49,14 +44,6 @@
                         </label>
                         <input type="password" class="form-control" id="password" name="password"
                                placeholder="비밀번호를 입력하세요" required>
-                    </div>
-
-                    <!-- 자동 로그인 -->
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="remember-me" name="remember-me">
-                        <label class="form-check-label" for="remember-me">
-                            로그인 상태 유지
-                        </label>
                     </div>
 
                     <!-- 로그인 버튼 -->

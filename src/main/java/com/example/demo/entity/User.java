@@ -7,8 +7,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Entity
 @Getter
@@ -32,6 +34,9 @@ public class User implements UserDetails {
 
     @Column(length = 20)
     private String phone;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -93,12 +98,13 @@ public class User implements UserDetails {
     // ===== UserDetails 구현부 =====
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority(role.getValue()));
+        // ✅ ROLE_ 접두사 필수!
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     @Override
     public String getUsername() {
-        return email; // username 대신 email 사용
+        return this.username; // username 대신 email 사용
     }
 
     @Override
@@ -112,4 +118,21 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() { return true; }
+    // 프로필 수정
+    public void updateProfile(String email, String phone, String address) {
+        this.email = email;
+        this.phone = phone;
+        this.address = address;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+        this.updatedAt = LocalDateTime.now();
+    }
+    // 생성일 포맷팅
+    public String getFormattedCreatedAt() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        return createdAt.format(formatter);
+    }
 }

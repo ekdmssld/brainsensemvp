@@ -1,0 +1,103 @@
+{{>layouts/shop-header}}
+
+<div class="row">
+    <!-- 사이드바 -->
+    <div class="col-md-2">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-shield-lock"></i> 관리자</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="/admin" class="list-group-item list-group-item-action">
+                    <i class="bi bi-speedometer2"></i> 대시보드
+                </a>
+                <a href="/admin/products" class="list-group-item list-group-item-action active">
+                    <i class="bi bi-box"></i> 상품 관리
+                </a>
+                <a href="/admin/orders" class="list-group-item list-group-item-action">
+                    <i class="bi bi-cart"></i> 주문 관리
+                </a>
+                <a href="/admin/users" class="list-group-item list-group-item-action">
+                    <i class="bi bi-people"></i> 회원 관리
+                </a>
+                <a href="/" class="list-group-item list-group-item-action">
+                    <i class="bi bi-house"></i> 메인으로
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 상품 목록 -->
+    <div class="col-md-10">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-box"></i> 상품 관리</h2>
+            <a href="/admin/products/new" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> 상품 등록
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>이미지</th>
+                            <th>상품명</th>
+                            <th>카테고리</th>
+                            <th>가격</th>
+                            <th>재고</th>
+                            <th>상태</th>
+                            <th>관리</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{#products}}
+                            <tr>
+                                <td>{{id}}</td>
+                                <td>
+                                    {{#imageUrl}}
+                                        <img src="{{imageUrl}}" alt="{{name}}" style="width: 50px; height: 50px; object-fit: cover;">
+                                    {{/imageUrl}}
+                                </td>
+                                <td>{{name}}</td>
+                                <td>{{categoryName}}</td>
+                                <td>{{formattedPrice}}</td>
+                                <td>{{stock}}</td>
+                                <td>
+                                    {{#isAvailable}}
+                                        <span class="badge bg-success">판매중</span>
+                                    {{/isAvailable}}
+                                    {{^isAvailable}}
+                                        <span class="badge bg-secondary">품절</span>
+                                    {{/isAvailable}}
+                                </td>
+                                <td>
+                                    <a href="/admin/products/{{id}}/edit" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteProduct({{id}})">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        {{/products}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function deleteProduct(id) {
+        if (confirm('정말 삭제하시겠습니까?')) {
+            // TODO: 삭제 API 호출
+            alert('삭제 기능은 추후 구현 예정입니다.');
+        }
+    }
+</script>
+
+{{>layouts/shop-footer}}

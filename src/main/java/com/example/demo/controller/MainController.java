@@ -2,11 +2,16 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.CategoryDTO;
 import com.example.demo.dto.ProductDTO;
+import com.example.demo.entity.Category;
+import com.example.demo.entity.User;
+import com.example.demo.repository.CategoryRepository;
 import com.example.demo.service.CategoryService;
 import com.example.demo.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,55 +25,57 @@ import org.springframework.ui.Model;
 @Slf4j
 public class MainController {
     private final ProductService productService;
-    private final CategoryService categoryService;
+    private final CategoryRepository categoryRepository;
 
-    @GetMapping({"", "/", "/products"})
-    public String mainPage(
-            @RequestParam(value = "category", required = false) Long categoryId,
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "12") int size,
-            @RequestParam(value = "search", required = false) String keyword,
-            Model model
-    ) {
-        log.info("메인 페이지 접근 - categoryId: {}, page: {}, keyword: {}", categoryId, page, keyword);
+    @GetMapping("/")
+    public String home(
+            @AuthenticationPrincipal User user,
+            Model model) {
 
-        // 카테고리 목록 조회 (헤더 메뉴용)
-        List<CategoryDTO> categories = categoryService.findAllTopCategory();
+        // 최신 상품 12개 표시
+        List<ProductDTO> products = productService.getLatestProducts(12);
+        List<Category> categories = categoryRepository.findByParentIsNull();
+
+        model.addAttribute("products", products);
         model.addAttribute("categories", categories);
+        model.addAttribute("user", user);  // ✅ 추가
 
-        // 상품 목록 조회
+        log.info("메인 페이지 - 상품 {}개", products.size());
+        return "index";
+    }
+
+    @GetMapping("/products")
+    public String productList(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Long category,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size,  // ✅ 한 페이지에 12개씩
+            @AuthenticationPrincipal User user,
+            Model model) {
+
         Page<ProductDTO> productPage;
 
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            // 검색어가 있으면 검색
-            List<ProductDTO> searchResults = productService.searchProducts(keyword);
-            model.addAttribute("products", searchResults);
-            model.addAttribute("keyword", keyword);
-            model.addAttribute("totalProducts", searchResults.size());
-        } else if (categoryId != null) {
-            // 카테고리 필터링
-            productPage = productService.getProductsByCategoryWithPaging(categoryId, page, size);
-            model.addAttribute("products", productPage.getContent());
-            model.addAttribute("totalPages", productPage.getTotalPages());
-            model.addAttribute("currentPage", page);
-            model.addAttribute("selectedCategoryId", categoryId);
-
-            // 선택된 카테고리 정보
-            CategoryDTO selectedCategory = categoryService.getCategoryById(categoryId);
-            model.addAttribute("selectedCategory", selectedCategory);
+        if (search != null && !search.isEmpty()) {
+            productPage = productService.searchProducts(search, PageRequest.of(page, size));
+            log.info("상품 검색 - keyword: {}, 결과: {}개", search, productPage.getTotalElements());
+        } else if (category != null) {
+            productPage = productService.getProductsByCategory(category, PageRequest.of(page, size));
+            log.info("카테고리 조회 - categoryId: {}, 결과: {}개", category, productPage.getTotalElements());
         } else {
-            // 전체 상품 조회
-            productPage = productService.getProductsWithPaging(page, size);
-            model.addAttribute("products", productPage.getContent());
-            model.addAttribute("totalPages", productPage.getTotalPages());
-            model.addAttribute("currentPage", page);
+            productPage = productService.getAllAvailableProducts(PageRequest.of(page, size));
+            log.info("전체 상품 조회 - 결과: {}개", productPage.getTotalElements());
         }
 
-        // 최신 상품 (사이드바용)
-        List<ProductDTO> latestProducts = productService.getLatestProducts(5);
-        model.addAttribute("latestProducts", latestProducts);
+        List<Category> categories = categoryRepository.findByParentIsNull();
 
-        return "main/index";
+        model.addAttribute("products", productPage);
+        model.addAttribute("categories", categories);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", productPage.getTotalPages());
+        model.addAttribute("search", search == null ? "" : search);
+        model.addAttribute("selectedCategory", category);
+
+        return "products/list";
     }
 
     @GetMapping("/guide")

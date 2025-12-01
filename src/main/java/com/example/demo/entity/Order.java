@@ -7,13 +7,12 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
 @Entity
+@Table(name = "orders")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-@Table(name = "orders")
 public class Order {
 
     @Id
@@ -21,121 +20,107 @@ public class Order {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private User member; // 주문자
+    @JoinColumn(name = "member_id", nullable = false)
+    private User member;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<OrderItem> orderItems = new ArrayList<>();
 
     @Column(nullable = false)
-    private Integer totalPrice; // 총 금액
+    private Integer totalPrice;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    @Builder.Default
-    private OrderStatus status = OrderStatus.PENDING; // 주문 상태
+    @Column(nullable = false, length = 20)
+    private OrderStatus status;
 
-    @Column(nullable = false)
-    @Builder.Default
-    private LocalDateTime orderDate = LocalDateTime.now(); // 주문일
+    @Column(name = "order_date", nullable = false)
+    private LocalDateTime orderDate;
 
-    @Column(nullable = false, length = 200)
-    private String deliveryAddress; // 배송지
+    @Column(name = "delivery_address", length = 200)
+    private String deliveryAddress;
 
-    @Column(length = 100)
-    private String recipientName; // 수령인
+    @Column(name = "recipient_name", length = 50)
+    private String recipientName;
 
-    @Column(length = 20)
-    private String recipientPhone; // 수령인 연락처
+    @Column(name = "recipient_phone", length = 20)
+    private String recipientPhone;
 
-    @Column(length = 100)
-    private String trackingNumber; // 송장번호
+    @Column(name = "tracking_number", length = 100)
+    private String trackingNumber;
 
-    @Column
-    private LocalDateTime paymentDate; // 결제일
-
-    @Column
-    private LocalDateTime deliveryDate; // 배송완료일
-
-    @Column(updatable = false)
-    @Builder.Default
-    private LocalDateTime createdAt = LocalDateTime.now(); // 생성일
-
-    @Column
-    @Builder.Default
-    private LocalDateTime updatedAt = LocalDateTime.now(); // 수정일
-
-    // 주문 상태 Enum
     public enum OrderStatus {
-        PENDING,        // 주문 대기
-        CONFIRMED,      // 주문 확인
-        PREPARING,      // 상품 준비중
-        SHIPPED,        // 배송중
-        DELIVERED,      // 배송완료
-        CANCELLED,      // 취소됨
-        REFUNDED        // 환불됨
+        PENDING,      // 주문 대기
+        CONFIRMED,    // 주문 확인
+        PREPARING,    // 상품 준비중
+        SHIPPED,      // 배송중
+        DELIVERED,    // 배송완료
+        CANCELLED,    // 취소됨
+        REFUNDED      // 환불됨
     }
 
-    // 비즈니스 메서드
+    @PrePersist
+    protected void onCreate() {
+        if (orderDate == null) {
+            orderDate = LocalDateTime.now();
+        }
+        if (status == null) {
+            status = OrderStatus.PENDING;
+        }
+    }
+
+    // === 비즈니스 로직 === //
+
+    // 총 가격 설정
+    public void setTotalPrice(Integer totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    // 주문 취소 (재고 복구) - 한 번만 정의
+    public void cancelOrder() {
+        if (this.status == OrderStatus.DELIVERED) {
+            throw new IllegalStateException("이미 배송 완료된 상품은 취소할 수 없습니다.");
+        }
+
+        if (this.status == OrderStatus.CANCELLED) {
+            throw new IllegalStateException("이미 취소된 주문입니다.");
+        }
+
+        this.status = OrderStatus.CANCELLED;
+
+        // 재고 복구
+        for (OrderItem orderItem : orderItems) {
+            orderItem.getProduct().addStock(orderItem.getQuantity());
+        }
+    }
+
+    // 주문 환불
+    public void refundOrder() {
+        if (this.status != OrderStatus.DELIVERED) {
+            throw new IllegalStateException("배송 완료된 상품만 환불할 수 있습니다.");
+        }
+
+        this.status = OrderStatus.REFUNDED;
+
+        // 재고 복구
+        for (OrderItem orderItem : orderItems) {
+            orderItem.getProduct().addStock(orderItem.getQuantity());
+        }
+    }
+
+    // 주문 상태 변경
+    public void changeStatus(OrderStatus newStatus) {
+        this.status = newStatus;
+    }
+
+    // 송장번호 입력
+    public void setTrackingNumber(String trackingNumber) {
+        this.trackingNumber = trackingNumber;
+        this.status = OrderStatus.SHIPPED;
+    }
     public void addOrderItem(OrderItem orderItem) {
         this.orderItems.add(orderItem);
         orderItem.setOrder(this);
-        this.updatedAt = LocalDateTime.now();
     }
 
-    public void changeStatus(OrderStatus status) {
-        this.status = status;
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    public void updateTrackingNumber(String trackingNumber) {
-        this.trackingNumber = trackingNumber;
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    public void completeDelivery() {
-        this.status = OrderStatus.DELIVERED;
-        this.deliveryDate = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    public void cancelOrder() {
-        if (this.status == OrderStatus.SHIPPED || this.status == OrderStatus.DELIVERED) {
-            throw new IllegalStateException("배송 중이거나 배송 완료된 주문은 취소할 수 없습니다.");
-        }
-        this.status = OrderStatus.CANCELLED;
-        this.updatedAt = LocalDateTime.now();
-
-        // 재고 복구
-        for (OrderItem orderItem : orderItems) {
-            orderItem.getProduct().addStock(orderItem.getQuantity());
-        }
-    }
-
-    public void refundOrder() {
-        this.status = OrderStatus.REFUNDED;
-        this.updatedAt = LocalDateTime.now();
-
-        // 재고 복구
-        for (OrderItem orderItem : orderItems) {
-            orderItem.getProduct().addStock(orderItem.getQuantity());
-        }
-    }
-
-    public static Order createOrder(User member, String deliveryAddress, String recipientName, String recipientPhone) {
-        return Order.builder()
-                .member(member)
-                .deliveryAddress(deliveryAddress)
-                .recipientName(recipientName)
-                .recipientPhone(recipientPhone)
-                .totalPrice(0)
-                .build();
-    }
-
-    public void calculateTotalPrice() {
-        this.totalPrice = orderItems.stream()
-                .mapToInt(OrderItem::getTotalPrice)
-                .sum();
-    }
 }
