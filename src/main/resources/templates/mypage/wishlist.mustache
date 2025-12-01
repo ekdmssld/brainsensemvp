@@ -1,0 +1,51 @@
+{{>layouts/shop-header}}
+
+<div class="container mt-4">
+    <h2><i class="bi bi-heart"></i> 위시리스트</h2>
+    <hr>
+
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+        {{#products}}
+            <div class="col">
+                <div class="card h-100">
+                    <a href="/products/{{id}}">
+                        {{#imageUrl}}
+                            <img src="{{imageUrl}}" class="card-img-top" alt="{{name}}"
+                                 style="height: 200px; object-fit: cover;">
+                        {{/imageUrl}}
+                        {{^imageUrl}}
+                            <div style="height: 200px; background-color: #e9ecef;"
+                                 class="d-flex align-items-center justify-content-center">
+                                <i class="bi bi-image" style="font-size: 3rem; color: #adb5bd;"></i>
+                            </div>
+                        {{/imageUrl}}
+                    </a>
+                    <div class="card-body">
+                        <h6 class="card-title">{{name}}</h6>
+                        <p class="text-primary fw-bold">{{formattedPrice}}</p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-footer">
+                            <form action="/wishlist/remove/{{id}}" method="post">
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>  <!-- ✅ 추가 -->
+                                <button type="submit" class="btn btn-danger btn-sm w-100">
+                                    <i class="bi bi-trash"></i> 제거
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {{/products}}
+    </div>
+
+    {{^products}}
+        <div class="text-center py-5">
+            <i class="bi bi-heart" style="font-size: 5rem; color: #ccc;"></i>
+            <p class="mt-3">위시리스트가 비어있습니다.</p>
+            <a href="/products" class="btn btn-primary">상품 보러가기</a>
+        </div>
+    {{/products}}
+</div>
+
+{{>layouts/shop-footer}}

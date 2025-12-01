@@ -1,0 +1,97 @@
+{{>layouts/shop-header}}
+
+<div class="container mt-4">
+    <h2><i class="bi bi-credit-card"></i> 주문/결제</h2>
+    <hr>
+
+    <!-- 안내 메시지 -->
+    <div class="alert alert-info">
+        <h5><i class="bi bi-info-circle"></i> 안내</h5>
+        <p>현재 결제 기능은 구현 중입니다. 실제 결제는 진행되지 않습니다.</p>
+    </div>
+
+    <!-- 주문 상품 목록 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5><i class="bi bi-box"></i> 주문 상품</h5>
+        </div>
+        <div class="card-body">
+            {{#cartItems}}
+                <div class="row mb-3 border-bottom pb-3">
+                    <div class="col-md-2">
+                        {{#productImage}}
+                            <img src="{{productImage}}" class="img-fluid" alt="{{productName}}">
+                        {{/productImage}}
+                    </div>
+                    <div class="col-md-6">
+                        <h6>{{productName}}</h6>
+                    </div>
+                    <div class="col-md-2">
+                        <p>{{quantity}}개</p>
+                    </div>
+                    <div class="col-md-2 text-end">
+                        <p class="fw-bold">{{formattedTotalPrice}}</p>
+                    </div>
+                </div>
+            {{/cartItems}}
+        </div>
+    </div>
+
+    <!-- 주문자 정보 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5><i class="bi bi-person"></i> 주문자 정보</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>이름:</strong> {{user.username}}</p>
+            <p><strong>이메일:</strong> {{user.email}}</p>
+            <p><strong>전화번호:</strong> {{user.phone}}</p>
+            <p><strong>배송지:</strong> {{user.address}}</p>
+        </div>
+    </div>
+
+    <!-- 결제 금액 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5><i class="bi bi-receipt"></i> 결제 금액</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-6">
+                    <h6>상품 금액</h6>
+                </div>
+                <div class="col-6 text-end">
+                    <h6>{{totalPrice}}원</h6>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <h6>배송비</h6>
+                </div>
+                <div class="col-6 text-end">
+                    <h6>무료</h6>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-6">
+                    <h4><strong>총 결제 금액</strong></h4>
+                </div>
+                <div class="col-6 text-end">
+                    <h4 class="text-primary"><strong>{{totalPrice}}원</strong></h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 결제 버튼 -->
+    <div class="text-center mb-5">
+        <form action="/order/complete" method="post">
+            <button class="btn btn-primary w-100 btn-lg">결제하기</button>
+        </form>
+
+
+    </div>
+</div>
+
+{{>layouts/shop-footer}}

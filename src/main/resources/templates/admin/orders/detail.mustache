@@ -1,0 +1,48 @@
+{{>layouts/shop-header}}
+
+<div class="container mt-4">
+    <h2><i class="bi bi-receipt"></i> 주문 상세 (#{{order.id}})</h2>
+    <hr>
+
+    <h5>주문 정보</h5>
+    <p><strong>주문자:</strong> {{order.memberName}}</p>
+    <p><strong>주문일:</strong> {{order.formattedOrderDate}}</p>
+    <p><strong>상태:</strong> {{order.statusDisplay}}</p>
+
+    <hr>
+
+    <h5>배송 정보</h5>
+    <p><strong>수령인:</strong> {{order.recipientName}}</p>
+    <p><strong>연락처:</strong> {{order.recipientPhone}}</p>
+    <p><strong>주소:</strong> {{order.deliveryAddress}}</p>
+
+    <hr>
+
+    <h5>주문 상품</h5>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>상품</th>
+            <th>단가</th>
+            <th>수량</th>
+            <th>총 금액</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#order.orderItems}}
+            <tr>
+                <td>{{productName}}</td>
+                <td>{{formattedPrice}}</td>
+                <td>{{quantity}}</td>
+                <td>{{formattedTotalPrice}}</td>
+            </tr>
+        {{/order.orderItems}}
+        </tbody>
+    </table>
+
+    <h4 class="text-end">총 결제 금액: <strong>{{order.formattedPrice}}</strong></h4>
+
+    <a href="/admin/orders" class="btn btn-secondary mt-3">뒤로가기</a>
+</div>
+
+{{>layouts/shop-footer}}

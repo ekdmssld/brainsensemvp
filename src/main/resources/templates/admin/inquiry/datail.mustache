@@ -1,0 +1,172 @@
+{{>layouts/shop-header}}
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- 사이드바 -->
+        <div class="col-md-2 bg-light vh-100">
+            <div class="list-group mt-3">
+                <a href="/admin" class="list-group-item list-group-item-action">
+                    <i class="bi bi-speedometer2"></i> 대시보드
+                </a>
+                <a href="/admin/products" class="list-group-item list-group-item-action">
+                    <i class="bi bi-box"></i> 상품 관리
+                </a>
+                <a href="/admin/orders" class="list-group-item list-group-item-action">
+                    <i class="bi bi-receipt"></i> 주문 관리
+                </a>
+                <a href="/admin/users" class="list-group-item list-group-item-action">
+                    <i class="bi bi-people"></i> 회원 관리
+                </a>
+                <a href="/admin/inquiry" class="list-group-item list-group-item-action active">
+                    <i class="bi bi-headset"></i> 고객센터
+                </a>
+            </div>
+        </div>
+
+        <!-- 메인 컨텐츠 -->
+        <div class="col-md-10">
+            <div class="mt-4">
+                <div class="row">
+                    <div class="col-lg-10 mx-auto">
+                        <!-- 메시지 표시 -->
+                        {{#message}}
+                            <div class="alert alert-{{alertType}} alert-dismissible fade show" role="alert">
+                                {{message}}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {{/message}}
+
+                        <!-- 문의 상세 -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="badge bg-info me-2">{{inquiry.typeDescription}}</span>
+                                        <span class="badge bg-{{inquiry.statusBadgeClass}}">{{inquiry.statusDescription}}</span>
+                                    </div>
+                                    <div>
+                                        <!-- 상태 변경 -->
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                                    data-bs-toggle="dropdown">
+                                                상태 변경
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <form action="/admin/inquiry/{{inquiry.id}}/status" method="post">
+                                                        <input type="hidden" name="status" value="PENDING">
+                                                        <button type="submit" class="dropdown-item">답변대기</button>
+                                                    </form>
+                                                </li>
+                                                <li>
+                                                    <form action="/admin/inquiry/{{inquiry.id}}/status" method="post">
+                                                        <input type="hidden" name="status" value="ANSWERED">
+                                                        <button type="submit" class="dropdown-item">답변완료</button>
+                                                    </form>
+                                                </li>
+                                                <li>
+                                                    <form action="/admin/inquiry/{{inquiry.id}}/status" method="post">
+                                                        <input type="hidden" name="status" value="CLOSED">
+                                                        <button type="submit" class="dropdown-item">처리완료</button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h4 class="card-title mb-3">{{inquiry.title}}</h4>
+                                <div class="mb-3">
+                                    <small class="text-muted">
+                                        <i class="bi bi-person"></i> {{inquiry.username}} |
+                                        <i class="bi bi-calendar"></i> {{inquiry.formattedCreatedAt}}
+                                    </small>
+                                </div>
+                                <hr>
+                                <div class="card-text" style="white-space: pre-wrap;">{{inquiry.content}}</div>
+                            </div>
+                        </div>
+
+                        <!-- 댓글 목록 -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0"><i class="bi bi-chat-dots"></i> 답변 내역 ({{comments.size}})</h5>
+                            </div>
+                            <div class="card-body">
+                                {{#comments}}
+                                    <div class="d-flex mb-3 {{#isAdmin}}bg-light p-3 rounded{{/isAdmin}}">
+                                        <div class="flex-shrink-0">
+                                            {{#isAdmin}}
+                                                <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center"
+                                                     style="width: 40px; height: 40px;">
+                                                    <i class="bi bi-shield-check"></i>
+                                                </div>
+                                            {{/isAdmin}}
+                                            {{^isAdmin}}
+                                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                                                     style="width: 40px; height: 40px;">
+                                                    <i class="bi bi-person"></i>
+                                                </div>
+                                            {{/isAdmin}}
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <strong>{{username}}</strong>
+                                                    {{#isAdmin}}<span class="badge bg-danger ms-2">관리자</span>{{/isAdmin}}
+                                                    <br>
+                                                    <small class="text-muted">{{formattedCreatedAt}}</small>
+                                                </div>
+                                                <form action="/admin/inquiry/comment/{{id}}/delete" method="post" class="d-inline"
+                                                      onsubmit="return confirm('댓글을 삭제하시겠습니까?');">
+                                                    <input type="hidden" name="inquiryId" value="{{inquiryId}}">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                            <div class="mt-2" style="white-space: pre-wrap;">{{content}}</div>
+                                        </div>
+                                    </div>
+                                {{/comments}}
+
+                                {{^comments}}
+                                    <p class="text-center text-muted py-4">
+                                        <i class="bi bi-chat-dots" style="font-size: 2rem;"></i><br>
+                                        아직 답변이 없습니다.
+                                    </p>
+                                {{/comments}}
+                            </div>
+                        </div>
+
+                        <!-- 답변 작성 -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-danger text-white">
+                                <h5 class="mb-0"><i class="bi bi-shield-check"></i> 관리자 답변 작성</h5>
+                            </div>
+                            <div class="card-body">
+                                <form action="/admin/inquiry/{{inquiry.id}}/comment" method="post">
+                                    <div class="mb-3">
+                                        <textarea class="form-control" name="content" rows="5"
+                                                  placeholder="답변 내용을 입력하세요..." required></textarea>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <a href="/admin/inquiry" class="btn btn-secondary">
+                                            <i class="bi bi-list"></i> 목록으로
+                                        </a>
+                                        <button type="submit" class="btn btn-danger">
+                                            <i class="bi bi-send"></i> 답변 등록
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{>layouts/shop-footer}}

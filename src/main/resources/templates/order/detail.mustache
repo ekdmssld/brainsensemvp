@@ -1,0 +1,19 @@
+{{>layouts/shop-header}}
+
+<div class="container mt-4">
+
+    <h2>주문 완료</h2>
+    <p>주문번호: {{order.id}}</p>
+    <p>총 금액: {{order.formattedPrice}}</p>
+    <p>주문일시: {{order.formattedOrderDate}}</p>
+
+    <h4>주문 상품</h4>
+    {{#order.orderItems}}
+        <div>
+            <p>{{productName}} ({{quantity}}개) - {{formattedTotalPrice}}</p>
+        </div>
+    {{/order.orderItems}}
+
+</div>
+
+{{>layouts/shop-footer}}

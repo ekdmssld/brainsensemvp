@@ -1,0 +1,171 @@
+{{>layouts/shop-header}}
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- 사이드바 -->
+        <div class="col-md-2 bg-light vh-100">
+            <div class="list-group mt-3">
+                <a href="/admin" class="list-group-item list-group-item-action">
+                    <i class="bi bi-speedometer2"></i> 대시보드
+                </a>
+                <a href="/admin/products" class="list-group-item list-group-item-action active">
+                    <i class="bi bi-box"></i> 상품 관리
+                </a>
+                <a href="/admin/orders" class="list-group-item list-group-item-action">
+                    <i class="bi bi-receipt"></i> 주문 관리
+                </a>
+                <a href="/admin/users" class="list-group-item list-group-item-action">
+                    <i class="bi bi-people"></i> 회원 관리
+                </a>
+            </div>
+        </div>
+
+        <!-- 메인 컨텐츠 -->
+        <div class="col-md-10">
+            <div class="mt-4">
+                <h2>
+                    <i class="bi bi-box"></i>
+                    {{#isEdit}}상품 수정{{/isEdit}}
+                    {{^isEdit}}상품 등록{{/isEdit}}
+                </h2>
+                <hr>
+
+                <form action="{{#isEdit}}/admin/products/{{product.id}}{{/isEdit}}{{^isEdit}}/admin/products{{/isEdit}}"
+                      method="post" enctype="multipart/form-data">
+
+                    <input type="hidden" name="_csrf" value="{{_csrf.token}}">
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <!-- 기본 정보 카드 -->
+                            <div class="card mb-3">
+                                <div class="card-header bg-primary text-white">
+                                    <i class="bi bi-info-circle"></i> 기본 정보
+                                </div>
+                                <div class="card-body">
+                                    <!-- 상품명 -->
+                                    <div class="mb-3">
+                                        <label class="form-label">상품명 *</label>
+                                        <input type="text" class="form-control" name="name"
+                                               value="{{product.name}}" required>
+                                    </div>
+
+                                    <!-- 설명 -->
+                                    <div class="mb-3">
+                                        <label class="form-label">상품 설명</label>
+                                        <textarea class="form-control" name="description" rows="5">{{product.description}}</textarea>
+                                    </div>
+
+                                    <!-- 가격 -->
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">가격 (원) *</label>
+                                                <input type="number" class="form-control" name="price"
+                                                       value="{{product.price}}" required min="0">
+                                            </div>
+                                        </div>
+
+                                        <!-- 재고 -->
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">재고 수량 *</label>
+                                                <input type="number" class="form-control" name="stock"
+                                                       value="{{product.stock}}" required min="0">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 카테고리 -->
+                                    <div class="mb-3">
+                                        <label class="form-label">카테고리 *</label>
+                                        <select class="form-select" name="categoryId" required>
+                                            <option value="">카테고리를 선택하세요</option>
+                                            {{#categories}}
+                                                {{^parent}}
+                                                    <option value="{{id}}" {{#selected}}selected{{/selected}}>{{name}}</option>
+                                                    {{#children}}
+                                                        <option value="{{id}}" {{#selected}}selected{{/selected}}>└ {{name}}</option>
+                                                    {{/children}}
+                                                {{/parent}}
+                                            {{/categories}}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <!-- 추가 정보 카드 -->
+                            <div class="card mb-3">
+                                <div class="card-header bg-info text-white">
+                                    <i class="bi bi-plus-circle"></i> 추가 정보
+                                </div>
+                                <div class="card-body">
+                                    <!-- 이미지 미리보기 -->
+                                    {{#isEdit}}
+                                        {{#product.imageUrl}}
+                                            <div class="mb-3 text-center">
+                                                <img src="{{product.imageUrl}}" alt="현재 이미지" class="img-fluid" style="max-height: 200px;">
+                                                <p class="text-muted mt-2 small">현재 이미지</p>
+                                            </div>
+                                        {{/product.imageUrl}}
+                                    {{/isEdit}}
+
+                                    <!-- 이미지 업로드 -->
+                                    <div class="mb-3">
+                                        <label class="form-label">상품 이미지</label>
+                                        <input type="file" class="form-control" name="imageFile" accept="image/*">
+                                        <small class="text-muted">JPG, PNG, GIF (최대 5MB)</small>
+                                    </div>
+
+                                    <!-- 제조사 -->
+                                    <div class="mb-3">
+                                        <label class="form-label">제조사</label>
+                                        <input type="text" class="form-control" name="manufacturer"
+                                               value="{{product.manufacturer}}" placeholder="예: Arduino">
+                                    </div>
+
+                                    <!-- 모델 번호 -->
+                                    <div class="mb-3">
+                                        <label class="form-label">모델 번호</label>
+                                        <input type="text" class="form-control" name="modelNumber"
+                                               value="{{product.modelNumber}}" placeholder="예: UNO-R3">
+                                    </div>
+
+                                    <!-- 판매 상태 -->
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" name="isAvailable"
+                                                   value="true" id="isAvailable"
+                                                {{#product.isAvailable}}checked{{/product.isAvailable}}
+                                                {{^isEdit}}checked{{/isEdit}}>
+                                            <label class="form-check-label" for="isAvailable">
+                                                판매중
+                                            </label>
+                                        </div>
+                                        <small class="text-muted">체크 해제 시 품절 상태로 표시됩니다</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 버튼 -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-5">
+                        <a href="/admin/products" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> 취소
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i>
+                            {{#isEdit}}수정 완료{{/isEdit}}
+                            {{^isEdit}}등록{{/isEdit}}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{>layouts/shop-footer}}

@@ -1,0 +1,21 @@
+<div class="card-header bg-light">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <span class="badge bg-info me-2">{{inquiry.typeDescription}}</span>
+            <span class="badge bg-{{inquiry.statusBadgeClass}}">{{inquiry.statusDescription}}</span>
+        </div>
+        <div>
+            {{#isPending}}
+                <a href="/inquiry/{{inquiry.id}}/edit" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-pencil"></i> 수정
+                </a>
+            {{/isPending}}
+            <form action="/inquiry/{{inquiry.id}}/delete" method="post" class="d-inline"
+                  onsubmit="return confirm('문의를 삭제하시겠습니까?');">
+                <button type="submit" class="btn btn-sm btn-outline-danger">
+                    <i class="bi bi-trash"></i> 삭제
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

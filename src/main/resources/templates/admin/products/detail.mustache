@@ -1,0 +1,26 @@
+{{>layouts/shop-header}}
+
+<div class="container mt-4">
+    <h2><i class="bi bi-box"></i> 상품 상세</h2>
+    <hr>
+
+    <img src="{{product.imageUrl}}" width="300">
+
+    <h3>{{product.name}}</h3>
+    <p>카테고리: {{product.categoryName}}</p>
+    <p>가격: {{product.formattedPrice}}</p>
+    <p>재고: {{product.stock}}</p>
+
+    <a class="btn btn-warning" href="/admin/products/{{product.id}}/edit">수정</a>
+
+    <form action="/admin/products/{{product.id}}/delete" method="post" style="display:inline-block;">
+        <button class="btn btn-danger"
+                onclick="return confirm('정말 삭제하시겠습니까?');">
+            삭제
+        </button>
+    </form>
+
+    <a href="/admin/products" class="btn btn-secondary">목록</a>
+</div>
+
+{{>layouts/shop-footer}}
