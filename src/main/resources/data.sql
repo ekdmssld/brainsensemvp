@@ -9,7 +9,7 @@ VALUES ('admin', 'admin@arduino.com', '$2a$10$t3l/xedx6VNUbQeoPHrBpu5lCXs.JQDp2V
 INSERT INTO users (username, email, password, phone, address, role, created_at)
 VALUES ('test', 'test@test.com', '$2a$10$eXTDbOj/gPQSamwi96mytuZ3vP7o6/uJSkgLU6p13QenlTGHQI/j6', '010-1111-1111', '서울시 서초구', 'USER', CURRENT_TIMESTAMP);
 
--- 테스트 사용자 (username: stc8652, password: 12345678)
+-- 테스트 사용자 (username: stc8652, password: 123456789)
 INSERT INTO users (username, email, password, phone, address, role, created_at)
 VALUES ('stc8652', 'ekdms8652@gmail.com', '$2a$10$sBPB2P/zaLDW4VL8G4g7NOph5psbwC42offhWmwNje3vjmawWOyO2', '010-7293-9042', '경상남도 밀양시', 'USER', CURRENT_TIMESTAMP);
 

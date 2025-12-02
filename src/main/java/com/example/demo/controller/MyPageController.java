@@ -48,13 +48,16 @@ public class MyPageController {
             @AuthenticationPrincipal User user,
             Model model) {
 
+        User refreshedUser = userRepository.findByUsername(user.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
         int orderCount = orderService.countOrdersByUsername(user.getUsername());
 
         List<Category> categories = categoryRepository.findByParentIsNull();
-        long wishlistCount = wishlistService.getWishlistCount(user);
-        long cartCount = cartService.getCartCount(user);
+        long wishlistCount = wishlistService.getWishlistCount(refreshedUser);
+        long cartCount = cartService.getCartCount(refreshedUser);
 
-        model.addAttribute("user", user);
+        model.addAttribute("user", refreshedUser);
         model.addAttribute("categories", categories);
         model.addAttribute("wishlistCount", wishlistCount);
         model.addAttribute("cartCount", cartCount);
@@ -92,8 +95,12 @@ public class MyPageController {
     }
 
     @GetMapping("/profile")
-    public String profile(@AuthenticationPrincipal User user, Model model) {
-        model.addAttribute("user", user);
+    public String myProfile(@AuthenticationPrincipal User user, Model model) {
+
+        User refreshedUser = userRepository.findByUsername(user.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다."));
+
+        model.addAttribute("user", refreshedUser);
         return "mypage/profile";
     }
 
