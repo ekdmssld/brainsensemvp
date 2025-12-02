@@ -28,7 +28,7 @@ public class InquiryController {
 
     private final InquiryService inquiryService;
 
-    // 문의 목록
+    // 문의 목록 (전체 공개)
     @GetMapping
     public String list(
             @AuthenticationPrincipal User user,
@@ -36,7 +36,9 @@ public class InquiryController {
             Model model) {
 
         Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
-        Page<InquiryDTO> inquiries = inquiryService.getUserInquiries(user.getUsername(), pageable);
+
+        // 전체 문의 조회
+        Page<InquiryDTO> inquiries = inquiryService.getAllInquiries(pageable);
 
         model.addAttribute("inquiries", inquiries);
         model.addAttribute("currentPage", page);
@@ -54,9 +56,8 @@ public class InquiryController {
 
         InquiryDTO inquiry = inquiryService.getInquiryById(id);
 
-        if (!inquiry.getUsername().equals(user.getUsername())) {
-            return "redirect:/inquiry?error=unauthorized";
-        }
+        // 열람 제한 제거 (누구나 볼 수 있음)
+        // 단, 수정/삭제는 작성자만 가능
 
         boolean isPending = "PENDING".equals(inquiry.getStatus());
         model.addAttribute("isPending", isPending);
