@@ -1,7 +1,7 @@
 {{>layouts/shop-header}}
 
 <div class="container mt-4">
-    <!-- ✅ 메시지 표시 추가 -->
+    <!--   메시지 표시 추가 -->
     {{#message}}
         <div class="alert alert-{{alertType}} alert-dismissible fade show" role="alert">
             {{message}}
@@ -36,7 +36,7 @@
                     </div>
                     <div class="card-footer bg-white border-top-0">
                         <form action="/wishlist/remove/{{id}}" method="post" class="d-inline w-100">
-                            <!-- ✅ CSRF 토큰 수정 -->
+                            <!--   CSRF 토큰 수정 -->
                             <button type="submit" class="btn btn-danger btn-sm w-100">
                                 <i class="bi bi-trash"></i> 제거
                             </button>

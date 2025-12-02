@@ -35,7 +35,7 @@ public class CartService {
     // 장바구니 아이템 조회
     public List<CartDTO> getCartItems(String username) {
         User user = findUserByUsername(username);
-        List<Cart> carts = cartRepository.findByMember(user);  // ✅ findByMember
+        List<Cart> carts = cartRepository.findByMember(user);  //   findByMember
 
         return carts.stream()
                 .map(CartDTO::fromEntity)
@@ -82,7 +82,7 @@ public class CartService {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new IllegalArgumentException("장바구니 아이템을 찾을 수 없습니다."));
 
-        if (!cart.getMember().getId().equals(user.getId())) {  // ✅ getMember
+        if (!cart.getMember().getId().equals(user.getId())) {  //   getMember
             throw new IllegalArgumentException("권한이 없습니다.");
         }
 
@@ -96,7 +96,7 @@ public class CartService {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new IllegalArgumentException("장바구니 아이템을 찾을 수 없습니다."));
 
-        if (!cart.getMember().getId().equals(user.getId())) {  // ✅ getMember
+        if (!cart.getMember().getId().equals(user.getId())) {  //   getMember
             throw new IllegalArgumentException("권한이 없습니다.");
         }
 
@@ -107,14 +107,14 @@ public class CartService {
     // 장바구니 전체 삭제
     public void clearCart(String username) {
         User user = findUserByUsername(username);
-        cartRepository.deleteByMember(user);  // ✅ deleteByMember
+        cartRepository.deleteByMember(user);  //   deleteByMember
         log.info("장바구니 전체 삭제 - username: {}", username);
     }
 
     // 장바구니 총 금액
     public Integer getTotalPrice(String username) {
         User user = findUserByUsername(username);
-        List<Cart> carts = cartRepository.findByMember(user);  // ✅ findByMember
+        List<Cart> carts = cartRepository.findByMember(user);  //   findByMember
         return carts.stream()
                 .mapToInt(Cart::getTotalPrice)
                 .sum();
@@ -122,6 +122,6 @@ public class CartService {
 
     // 장바구니 개수
     public long getCartCount(User user) {
-        return cartRepository.countByMember(user);  // ✅ countByMember
+        return cartRepository.countByMember(user);  //   countByMember
     }
 }

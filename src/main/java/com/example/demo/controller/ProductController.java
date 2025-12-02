@@ -1,11 +1,13 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.ProductDTO;
+import com.example.demo.dto.ReviewDTO;
 import com.example.demo.entity.Category;
 import com.example.demo.entity.User;
 import com.example.demo.repository.CategoryRepository;
 import com.example.demo.service.CategoryService;
 import com.example.demo.service.ProductService;
+import com.example.demo.service.ReviewService;
 import com.example.demo.service.WishlistService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +29,7 @@ public class ProductController {
     private final ProductService productService;
     private final CategoryRepository categoryRepository;
     private final WishlistService wishlistService;
+    private final ReviewService reviewService;
 
     @GetMapping("/{id}")
     public String detail(
@@ -44,11 +47,35 @@ public class ProductController {
             isInWishlist = wishlistService.isInWishlist(user, id);
         }
 
+        //리뷰 정보 추가
+        List<ReviewDTO> reviews = reviewService.getProductReviews(id);
+        Double averageRating = reviewService.getAverageRating(id);
+        long reviewCount = reviewService.getReviewCount(id);
+
+        boolean canWriteReview = false;
+        if(user != null){
+            canWriteReview = reviewService.canWriteReview(user.getUsername(), id);
+        }
+
+        if(user != null){
+            for(ReviewDTO review : reviews){
+                review.setEditable(review.getMemberName().equals(user.getUsername()) );
+
+                review.getComments().forEach(comment ->
+                        comment.setDeletable(comment.getMemberName().equals(user.getUsername()))
+                );
+            }
+        }
+
         model.addAttribute("product", product);
         model.addAttribute("user", user);
         model.addAttribute("isInWishlist", isInWishlist);
+        model.addAttribute("reviews", reviews);
+        model.addAttribute("averageRating", String.format("%.1f", averageRating));
+        model.addAttribute("reviewCount", reviewCount);
+        model.addAttribute("canWriteReview", canWriteReview);
 
-        // ✅ 성공/오류 메시지 처리
+        //   성공/오류 메시지 처리
         if (success != null) {
             switch (success) {
                 case "wishlist_added":

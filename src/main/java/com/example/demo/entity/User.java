@@ -99,7 +99,7 @@ public class User implements UserDetails {
     // ===== UserDetails 구현부 =====
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // ✅ ROLE_ 접두사 필수!
+        //   ROLE_ 접두사 필수!
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 

@@ -147,7 +147,7 @@ public class MyPageController {
 
             userRepository.save(userEntity);
 
-            // ✅ 비밀번호 변경 시 로그아웃 후 로그인 페이지로 리다이렉트
+            //   비밀번호 변경 시 로그아웃 후 로그인 페이지로 리다이렉트
             if (passwordChanged) {
                 // 로그아웃 처리
                 Authentication auth = SecurityContextHolder.getContext().getAuthentication();

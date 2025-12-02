@@ -48,13 +48,13 @@ public class WishlistService {
     }
 
     /**
-     * ✅ 위시리스트에서 상품 제거 - 수정
+     *   위시리스트에서 상품 제거 - 수정
      */
     @Transactional
     public void removeFromWishlist(User user, Long productId) {
         Optional<Wishlist> wishlist = wishlistRepository.findByUserAndProductId(user, productId);
 
-        // ✅ 위시리스트에 없어도 예외를 던지지 않고 로그만 남김
+        //   위시리스트에 없어도 예외를 던지지 않고 로그만 남김
         if (wishlist.isEmpty()) {
             log.warn("위시리스트에서 제거 시도했으나 항목이 없음 - userId: {}, productId: {}", user.getId(), productId);
             return;

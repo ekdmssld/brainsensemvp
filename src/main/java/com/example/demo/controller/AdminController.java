@@ -118,7 +118,7 @@ public class AdminController {
 
         model.addAttribute("users", users);
         model.addAttribute("categories", categories);
-        model.addAttribute("search", search != null ? search : "");  // ✅ null이면 빈 문자열
+        model.addAttribute("search", search != null ? search : "");  //   null이면 빈 문자열
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", users.getTotalPages());
 

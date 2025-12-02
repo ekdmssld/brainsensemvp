@@ -33,7 +33,7 @@ public class WishlistController {
         return "mypage/wishlist";
     }
 
-    // ✅ 위시리스트에 추가 - redirectAttributes 사용
+    //   위시리스트에 추가 - redirectAttributes 사용
     @PostMapping("/add/{productId}")
     public String addToWishlist(
             @PathVariable Long productId,

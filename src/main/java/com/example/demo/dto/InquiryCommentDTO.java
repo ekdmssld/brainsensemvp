@@ -22,7 +22,7 @@ public class InquiryCommentDTO {
     private String content;
     private Boolean isAdmin;
     private LocalDateTime createdAt;
-    private Boolean deletable;  // ✅ 추가
+    private Boolean deletable;  //   추가
 
     public static InquiryCommentDTO fromEntity(InquiryComment comment) {
         return InquiryCommentDTO.builder()
@@ -33,7 +33,7 @@ public class InquiryCommentDTO {
                 .content(comment.getContent())
                 .isAdmin(comment.getIsAdmin())
                 .createdAt(comment.getCreatedAt())
-                .deletable(false)  // ✅ 기본값
+                .deletable(false)  //   기본값
                 .build();
     }
 

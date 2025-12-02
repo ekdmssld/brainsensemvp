@@ -26,7 +26,7 @@ public class Product {
     @Column(nullable = false)
     private Integer price;
 
-    @Column(name = "stock_quantity")  // ✅ 이것만 사용
+    @Column(name = "stock_quantity")  //   이것만 사용
     private Integer stockQuantity;
 
     @ManyToOne(fetch = FetchType.LAZY)

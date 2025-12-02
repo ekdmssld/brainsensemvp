@@ -90,7 +90,7 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                     .permitAll()
             )
             .logout(logout -> logout
-                    .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET")) // ✅ 여기만 변경
+                    .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET")) //   여기만 변경
                     .logoutSuccessUrl("/")
                     .permitAll()
             )
@@ -100,6 +100,7 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                     .ignoringRequestMatchers("/admin/**")
                     .ignoringRequestMatchers("/inquiry/**")
                     .ignoringRequestMatchers("/mypage/**")
+                    .ignoringRequestMatchers("/review/**")
             )
             .headers(headers -> headers
                     .frameOptions(frameOptions -> frameOptions.disable())

@@ -38,7 +38,7 @@ public class MainController {
 
         model.addAttribute("products", products);
         model.addAttribute("categories", categories);
-        model.addAttribute("user", user);  // ✅ 추가
+        model.addAttribute("user", user);  //   추가
 
         log.info("메인 페이지 - 상품 {}개", products.size());
         return "index";
@@ -49,7 +49,7 @@ public class MainController {
             @RequestParam(required = false) String search,
             @RequestParam(required = false) Long category,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "12") int size,  // ✅ 한 페이지에 12개씩
+            @RequestParam(defaultValue = "12") int size,  //   한 페이지에 12개씩
             @AuthenticationPrincipal User user,
             Model model) {
 

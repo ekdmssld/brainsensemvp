@@ -186,7 +186,7 @@ public class ProductService {
                 .name(dto.getName())
                 .description(dto.getDescription())
                 .price(dto.getPrice())
-                .stockQuantity(dto.getStock())            // ✅ AdminProductDTO의 stock 사용
+                .stockQuantity(dto.getStock())            //   AdminProductDTO의 stock 사용
                 .category(category)
                 .manufacturer(dto.getManufacturer())
                 .modelNumber(dto.getModelNumber())
@@ -238,7 +238,7 @@ public class ProductService {
         );
 
         if (dto.getStock() != null) {
-            product.setStock(dto.getStock());        // ✅ 재고 필드 갱신
+            product.setStock(dto.getStock());        //   재고 필드 갱신
         }
 
 //        // isAvailable도 DTO에 값이 있다면 업데이트

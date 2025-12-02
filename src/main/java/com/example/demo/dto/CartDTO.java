@@ -44,7 +44,7 @@ public class CartDTO {
                 .productName(product.getName())
                 .productImage(product.getImageUrl())
                 .price(price)
-                .stock(product.getStockQuantity())  // ✅ 재고 정보 포함
+                .stock(product.getStockQuantity())  //   재고 정보 포함
                 .quantity(quantity)
                 .totalPrice(price * quantity)
                 .build();

@@ -26,7 +26,7 @@ public class AdminInquiryController {
 
     private final InquiryService inquiryService;
 
-    // ✅ 헤더에서 공통으로 쓰는 값 세팅 (관리자 화면에서는 0으로만 넣어도 OK)
+    //   헤더에서 공통으로 쓰는 값 세팅 (관리자 화면에서는 0으로만 넣어도 OK)
     private void addHeaderAttributes(Model model, User user) {
         model.addAttribute("user", user);
         model.addAttribute("wishlistCount", 0);
