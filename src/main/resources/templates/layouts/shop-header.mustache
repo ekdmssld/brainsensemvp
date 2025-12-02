@@ -51,14 +51,13 @@
     <div class="container-fluid px-4">
         <div class="d-flex justify-content-end align-items-center">
 
-            {{#user.authorities}}
-                {{#authority}}
-                    {{#authority.equals}}ROLE_ADMIN{{/authority.equals}}
-                    <a href="/admin" class="text-danger fw-bold">
-                        <i class="bi bi-shield-lock"></i> 관리자 대시보드
+            {{#isAdmin}}
+                <li class="nav-item">
+                    <a class="nav-link text-danger" href="/admin">
+                        <i class="bi bi-speedometer2"></i> 관리자 대시보드
                     </a>
-                {{/authority}}
-            {{/user.authorities}}
+                </li>
+            {{/isAdmin}}
 
             <a href="/inquiry"><i class="bi bi-headset"></i> 고객센터</a>
 

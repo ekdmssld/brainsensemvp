@@ -135,4 +135,8 @@ public class User implements UserDetails {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         return createdAt.format(formatter);
     }
+
+    public boolean isAdmin() {
+        return this.role == Role.ADMIN;
+    }
 }

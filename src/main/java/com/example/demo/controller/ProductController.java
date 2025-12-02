@@ -29,39 +29,47 @@ public class ProductController {
     private final WishlistService wishlistService;
 
     @GetMapping("/{id}")
-    public String productDetail(
+    public String detail(
             @PathVariable Long id,
-            @RequestParam(required = false) String success,
             @AuthenticationPrincipal User user,
+            @RequestParam(required = false) String success,
+            @RequestParam(required = false) String error,
             Model model) {
 
         ProductDTO product = productService.getProductById(id);
-        List<Category> categories = categoryRepository.findByParentIsNull();
 
-        // 위시리스트 여부
+        // 위시리스트 여부 확인
         boolean isInWishlist = false;
         if (user != null) {
             isInWishlist = wishlistService.isInWishlist(user, id);
         }
 
-        // 성공 메시지 처리
-        if ("wishlist_added".equals(success)) {
-            model.addAttribute("successMessage", "위시리스트에 추가되었습니다.");
-        } else if ("wishlist_removed".equals(success)) {
-            model.addAttribute("successMessage", "위시리스트에서 제거되었습니다.");
-        } else if ("cart_added".equals(success)) {
-            model.addAttribute("successMessage", "장바구니에 추가되었습니다.");
+        model.addAttribute("product", product);
+        model.addAttribute("user", user);
+        model.addAttribute("isInWishlist", isInWishlist);
+
+        // ✅ 성공/오류 메시지 처리
+        if (success != null) {
+            switch (success) {
+                case "wishlist_added":
+                    model.addAttribute("successMessage", "위시리스트에 추가되었습니다!");
+                    break;
+                case "wishlist_removed":
+                    model.addAttribute("successMessage", "위시리스트에서 제거되었습니다!");
+                    break;
+                case "cart_added":
+                    model.addAttribute("successMessage", "장바구니에 추가되었습니다!");
+                    break;
+            }
         }
 
-        model.addAttribute("product", product);
-        model.addAttribute("categories", categories);
-        model.addAttribute("isInWishlist", isInWishlist);
-        model.addAttribute("user", user);
-
-        // 🔥 중요! Mustache에서 로그인 여부 판단 가능하도록
-        model.addAttribute("isLoggedIn", user != null);
-
-        log.info("상품 상세 조회 - ID: {}, 이름: {}, 위시리스트: {}", id, product.getName(), isInWishlist);
+        if (error != null) {
+            switch (error) {
+                case "wishlist_exists":
+                    model.addAttribute("errorMessage", "이미 위시리스트에 추가된 상품입니다.");
+                    break;
+            }
+        }
 
         return "products/detail";
     }

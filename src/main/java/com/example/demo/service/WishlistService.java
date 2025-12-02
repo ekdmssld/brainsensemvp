@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,14 +48,19 @@ public class WishlistService {
     }
 
     /**
-     * 위시리스트에서 상품 제거
+     * ✅ 위시리스트에서 상품 제거 - 수정
      */
     @Transactional
     public void removeFromWishlist(User user, Long productId) {
-        Wishlist wishlist = wishlistRepository.findByUserAndProductId(user, productId)
-                .orElseThrow(() -> new IllegalArgumentException("위시리스트에 없는 상품입니다."));
+        Optional<Wishlist> wishlist = wishlistRepository.findByUserAndProductId(user, productId);
 
-        wishlistRepository.delete(wishlist);
+        // ✅ 위시리스트에 없어도 예외를 던지지 않고 로그만 남김
+        if (wishlist.isEmpty()) {
+            log.warn("위시리스트에서 제거 시도했으나 항목이 없음 - userId: {}, productId: {}", user.getId(), productId);
+            return;
+        }
+
+        wishlistRepository.delete(wishlist.get());
         log.info("위시리스트 제거 - userId: {}, productId: {}", user.getId(), productId);
     }
 

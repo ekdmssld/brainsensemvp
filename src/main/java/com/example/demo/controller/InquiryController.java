@@ -47,7 +47,7 @@ public class InquiryController {
         return "inquiry/list";
     }
 
-    // 문의 상세
+    // 문의 상세 (전체 공개, 작성자만 수정/삭제 가능)
     @GetMapping("/{id}")
     public String detail(
             @PathVariable Long id,
@@ -56,28 +56,30 @@ public class InquiryController {
 
         InquiryDTO inquiry = inquiryService.getInquiryById(id);
 
-        // 열람 제한 제거 (누구나 볼 수 있음)
-        // 단, 수정/삭제는 작성자만 가능
+        Long loginUserId = (user != null) ? user.getId() : null;
 
+        boolean isAuthor = (loginUserId != null) && inquiry.getUserId().equals(loginUserId);
         boolean isPending = "PENDING".equals(inquiry.getStatus());
-        model.addAttribute("isPending", isPending);
 
         List<InquiryCommentDTO> comments = inquiryService.getComments(id);
         for (InquiryCommentDTO c : comments) {
-            c.setDeletable(c.getUserId().equals(user.getId()));
+            boolean deletable = (loginUserId != null) && c.getUserId().equals(loginUserId);
+            c.setDeletable(deletable);
         }
 
         model.addAttribute("inquiry", inquiry);
         model.addAttribute("comments", comments);
         model.addAttribute("user", user);
+        model.addAttribute("isAuthor", isAuthor);
+        model.addAttribute("isPending", isPending);
 
         return "inquiry/detail";
     }
 
-    // ✅ 문의 작성 폼 - 완전히 수정
+    // 문의 작성 폼
     @GetMapping("/new")
     public String newForm(@AuthenticationPrincipal User user, Model model) {
-        // 빈 InquiryDTO 객체 생성 (모든 필드 빈 문자열로 초기화)
+
         InquiryDTO inquiry = InquiryDTO.builder()
                 .title("")
                 .content("")
@@ -87,7 +89,7 @@ public class InquiryController {
         model.addAttribute("user", user);
         model.addAttribute("inquiry", inquiry);
         model.addAttribute("types", convertTypes(null));
-        model.addAttribute("isEdit", false);  // ✅ 등록/수정 구분
+        model.addAttribute("isEdit", false);
 
         return "inquiry/form";
     }
@@ -115,7 +117,7 @@ public class InquiryController {
         }
     }
 
-    // ✅ 문의 수정 폼 - 완전히 수정
+    // 문의 수정 폼
     @GetMapping("/{id}/edit")
     public String editForm(
             @PathVariable Long id,
@@ -124,6 +126,7 @@ public class InquiryController {
 
         InquiryDTO inquiry = inquiryService.getInquiryById(id);
 
+        // 작성자만 수정 폼 접근 가능
         if (!inquiry.getUsername().equals(user.getUsername())) {
             return "redirect:/inquiry?error=unauthorized";
         }
@@ -134,7 +137,7 @@ public class InquiryController {
         model.addAttribute("inquiry", inquiry);
         model.addAttribute("user", user);
         model.addAttribute("types", convertTypes(inquiry.getType()));
-        model.addAttribute("isEdit", true);  // ✅ 등록/수정 구분
+        model.addAttribute("isEdit", true);
 
         return "inquiry/form";
     }
