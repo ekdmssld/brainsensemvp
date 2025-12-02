@@ -95,10 +95,10 @@ public class InquiryService {
             throw new RuntimeException("본인의 문의만 수정할 수 있습니다.");
         }
 
-        // 답변이 달린 경우 수정 불가
-        if (inquiry.getStatus() != Inquiry.InquiryStatus.PENDING) {
-            throw new RuntimeException("답변이 달린 문의는 수정할 수 없습니다.");
-        }
+//        // 답변이 달린 경우 수정 불가
+//        if (inquiry.getStatus() != Inquiry.InquiryStatus.PENDING) {
+//            throw new RuntimeException("답변이 달린 문의는 수정할 수 없습니다.");
+//        }
 
         inquiry.updateInquiry(title, content, Inquiry.InquiryType.valueOf(type));
 

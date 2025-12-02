@@ -12,7 +12,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 @Controller
 @RequestMapping("/cart")
@@ -28,6 +30,11 @@ public class CartController {
      */
     @GetMapping
     public String cartPage(@AuthenticationPrincipal User user, @AuthenticationPrincipal UserDetails userDetails, Model model) {
+        List<CartDTO> cartItems = cartService.getCartItems(user.getUsername());
+
+        int totalPrice = cartItems.stream()
+                .mapToInt(CartDTO::getTotalPrice)
+                .sum();
         if (userDetails == null) {
             return "redirect:/login?redirect=/cart";
         }
@@ -35,13 +42,12 @@ public class CartController {
         String username = userDetails.getUsername();
         log.info("장바구니 페이지 접근 - user: {}", username);
 
-        List<CartDTO> cartItems = cartService.getCartItems(username);
-        Integer totalPrice = cartService.getTotalPrice(username);
+        String formattedTotalPrice = NumberFormat.getNumberInstance(Locale.KOREA).format(totalPrice) + "원";
 
         model.addAttribute("cartItems", cartItems);
-        model.addAttribute("totalPrice", totalPrice);
-        model.addAttribute("formattedTotalPrice", String.format("%,d원", totalPrice));
+        model.addAttribute("totalPrice", formattedTotalPrice);
         model.addAttribute("user", user);
+        model.addAttribute("hasItems", !cartItems.isEmpty());
 
         return "cart/list";
     }

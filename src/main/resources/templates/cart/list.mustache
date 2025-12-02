@@ -1,80 +1,68 @@
 {{>layouts/shop-header}}
 
 <div class="container mt-4">
+    <!-- 메시지 표시 -->
+    {{#message}}
+        <div class="alert alert-{{alertType}} alert-dismissible fade show" role="alert">
+            {{message}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {{/message}}
+
     <h2><i class="bi bi-cart"></i> 장바구니</h2>
     <hr>
 
     {{#cartItems}}
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <!-- 상품 이미지 -->
-                            <div class="col-md-2">
-                                {{#productImage}}
-                                    <img src="{{productImage}}" alt="{{productName}}"
-                                         class="img-fluid" style="max-height: 150px;">
-                                {{/productImage}}
-                                {{^productImage}}
-                                    <div style="height: 150px; background-color: #e9ecef;"
-                                         class="d-flex align-items-center justify-content-center">
-                                        <i class="bi bi-image" style="font-size: 3rem; color: #adb5bd;"></i>
-                                    </div>
-                                {{/productImage}}
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <!-- 상품 이미지 -->
+                    <div class="col-md-2">
+                        {{#productImageUrl}}
+                            <img src="{{productImageUrl}}" alt="{{productName}}"
+                                 class="img-fluid rounded" style="max-height: 100px; object-fit: cover;">
+                        {{/productImageUrl}}
+                        {{^productImageUrl}}
+                            <div style="height: 100px; background-color: #e9ecef;"
+                                 class="d-flex align-items-center justify-content-center rounded">
+                                <i class="bi bi-image" style="font-size: 2rem; color: #adb5bd;"></i>
                             </div>
+                        {{/productImageUrl}}
+                    </div>
 
-                            <!-- 상품 정보 -->
-                            <div class="col-md-4">
-                                <h5>
-                                    <a href="/products/{{productId}}" class="text-decoration-none">{{productName}}</a>
-                                </h5>
-                                <p class="text-primary fw-bold mb-0">{{formattedPrice}}</p>
-                            </div>
+                    <!-- 상품 정보 -->
+                    <div class="col-md-4">
+                        <h5>
+                            <a href="/products/{{productId}}" class="text-decoration-none text-dark">
+                                {{productName}}
+                            </a>
+                        </h5>
+                        <p class="text-primary fw-bold mb-0">{{formattedPrice}}</p>
+                    </div>
 
-                            <!-- 수량 조절 -->
-                            <form action="/cart/update" method="post" class="d-flex align-items-center">
-                                <input type="hidden" name="cartId" value="{{id}}">
-
-                                <button type="button" class="btn btn-outline-secondary decrease-btn">
-                                    <i class="bi bi-dash"></i>
-                                </button>
-
-                                <input
-                                        type="number"
-                                        class="form-control text-center quantity-input"
-                                        name="quantity"
-                                        value="{{quantity}}"
-                                        min="1"
-                                        max="{{stock}}"
-                                        readonly
-                                        style="width: 70px;"
-                                >
-
-                                <button type="button" class="btn btn-outline-secondary increase-btn">
-                                    <i class="bi bi-plus"></i>
-                                </button>
-
-                                <button type="submit" class="btn btn-sm btn-outline-primary ms-2">
-                                    <i class="bi bi-arrow-clockwise"></i>
-                                </button>
-                            </form>
-
-                            <!-- 소계 -->
-                            <div class="col-md-2">
-                                <h5 class="text-end text-primary">{{formattedTotalPrice}}</h5>
-                            </div>
-
-                            <!-- 삭제 버튼 -->
-                            <div class="col-md-1">
-                                <form action="/cart/remove" method="post">
-                                    <input type="hidden" name="cartId" value="{{id}}">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger w-100">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
+                    <!-- 수량 조절 -->
+                    <div class="col-md-3">
+                        <div class="input-group" style="max-width: 200px;">
+                            <button class="btn btn-outline-secondary" type="button"
+                                    onclick="updateQuantity({{id}}, {{quantity}} - 1)">
+                                <i class="bi bi-dash"></i>
+                            </button>
+                            <input type="number" class="form-control text-center" value="{{quantity}}"
+                                   min="1" readonly>
+                            <button class="btn btn-outline-secondary" type="button"
+                                    onclick="updateQuantity({{id}}, {{quantity}} + 1)">
+                                <i class="bi bi-plus"></i>
+                            </button>
                         </div>
+                    </div>
+
+                    <!-- 소계 및 삭제 버튼 -->
+                    <div class="col-md-3 text-end">
+                        <h5 class="text-primary mb-3">{{formattedTotalPrice}}</h5>
+                        <button class="btn btn-outline-danger btn-sm"
+                                onclick="removeFromCart({{id}})">
+                            <i class="bi bi-trash"></i> 삭제
+                        </button>
                     </div>
                 </div>
             </div>
@@ -82,60 +70,96 @@
     {{/cartItems}}
 
     {{^cartItems}}
-        <div class="text-center py-5">
-            <i class="bi bi-cart-x" style="font-size: 5rem; color: #ccc;"></i>
-            <p class="mt-3 text-muted">장바구니가 비어있습니다.</p>
-            <a href="/products" class="btn btn-primary">상품 보러가기</a>
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-cart-x text-muted" style="font-size: 5rem;"></i>
+                <h4 class="mt-3">장바구니가 비어있습니다</h4>
+                <p class="text-muted">지금 바로 쇼핑을 시작해보세요!</p>
+                <a href="/products" class="btn btn-primary mt-3">
+                    <i class="bi bi-shop"></i> 쇼핑하러 가기
+                </a>
+            </div>
         </div>
     {{/cartItems}}
 
-    <!-- 총 금액 및 주문 -->
-    {{#cartItems}}
+    <!-- ✅ 전체 주문 섹션 (장바구니에 상품이 있을 때만 표시) -->
+    {{#hasItems}}
         <div class="card mt-4">
             <div class="card-body">
-                <div class="row">
-                    <div class="col-md-8">
-                        <form action="/cart/clear" method="post" class="d-inline">
+                <div class="row align-items-center">
+
+                    <div class="col-md-6">
+                        <form action="/cart/clear" method="post">
                             <button type="submit" class="btn btn-outline-danger">
                                 <i class="bi bi-trash"></i> 장바구니 비우기
                             </button>
                         </form>
                     </div>
-                    <div class="col-md-4 text-end">
-                        <h4>총 금액: <span class="text-primary">{{formattedTotalPrice}}</span></h4>
-                        <a href="/order/checkout" class="btn btn-primary btn-lg w-100 mt-3">
-                            <i class="bi bi-credit-card"></i> 주문하기
-                        </a>
+
+                    <div class="col-md-6 text-end">
+                        <h4 class="mb-3">
+                            <strong>총 금액:</strong>
+                            <span class="text-primary">{{totalPrice}}</span>
+                        </h4>
+
+                        <form action="/order/checkout" method="get">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-credit-card"></i> 전체 주문하기
+                            </button>
+                        </form>
                     </div>
+
                 </div>
             </div>
         </div>
-    {{/cartItems}}
+    {{/hasItems}}
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        document.querySelectorAll(".quantity-input").forEach((input, index) => {
-            const decreaseBtn = document.querySelectorAll(".decrease-btn")[index];
-            const increaseBtn = document.querySelectorAll(".increase-btn")[index];
+    // 수량 업데이트
+    function updateQuantity(cartId, newQuantity) {
+        if (newQuantity < 1) {
+            alert('수량은 최소 1개 이상이어야 합니다.');
+            return;
+        }
 
-            const maxStock = parseInt(input.getAttribute("max"));
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/cart/update';
 
-            decreaseBtn.addEventListener("click", () => {
-                let value = parseInt(input.value);
-                if (value > 1) input.value = value - 1;
-            });
+        const cartIdInput = document.createElement('input');
+        cartIdInput.type = 'hidden';
+        cartIdInput.name = 'cartId';
+        cartIdInput.value = cartId;
 
-            increaseBtn.addEventListener("click", () => {
-                let value = parseInt(input.value);
-                if (value < maxStock) {
-                    input.value = value + 1;
-                } else {
-                    alert("재고 수량을 초과할 수 없습니다.");
-                }
-            });
-        });
-    });
+        const quantityInput = document.createElement('input');
+        quantityInput.type = 'hidden';
+        quantityInput.name = 'quantity';
+        quantityInput.value = newQuantity;
+
+        form.appendChild(cartIdInput);
+        form.appendChild(quantityInput);
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    // 삭제
+    function removeFromCart(cartId) {
+        if (confirm('이 상품을 장바구니에서 삭제하시겠습니까?')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/cart/remove';
+
+            const cartIdInput = document.createElement('input');
+            cartIdInput.type = 'hidden';
+            cartIdInput.name = 'cartId';
+            cartIdInput.value = cartId;
+
+            form.appendChild(cartIdInput);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
 </script>
 
 {{>layouts/shop-footer}}

@@ -235,6 +235,18 @@ public class OrderService {
         return orderRepository.countByMember(user);
     }
 
+    @Transactional
+    public void updateOrderStatus(Long orderId, String status) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다."));
+
+        Order.OrderStatus newStatus = Order.OrderStatus.valueOf(status);
+
+        order.changeStatus(newStatus); // 기존 엔티티 메서드 활용
+
+        log.info("주문 상태 변경 완료 - ID: {}, STATUS: {}", orderId, newStatus);
+    }
+
 
 
 }

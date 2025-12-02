@@ -130,9 +130,9 @@ public class InquiryController {
         if (!inquiry.getUsername().equals(user.getUsername())) {
             return "redirect:/inquiry?error=unauthorized";
         }
-        if (!"PENDING".equals(inquiry.getStatus())) {
-            return "redirect:/inquiry/" + id + "?error=cannot_edit";
-        }
+//        if (!"PENDING".equals(inquiry.getStatus())) {
+//            return "redirect:/inquiry/" + id + "?error=cannot_edit";
+//        }
 
         model.addAttribute("inquiry", inquiry);
         model.addAttribute("user", user);

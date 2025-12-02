@@ -24,10 +24,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -127,5 +125,22 @@ public class AdminController {
         log.info("회원 관리 - 총 회원: {}, 페이지: {}/{}", users.getTotalElements(), page + 1, users.getTotalPages());
 
         return "admin/users/list";
+    }
+    @PostMapping("/orders/{id}/status")
+    public String updateOrderStatus(
+            @PathVariable Long id,
+            @RequestParam String status,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            orderService.updateOrderStatus(id, status);
+            redirectAttributes.addFlashAttribute("message", "주문 상태가 변경되었습니다.");
+            redirectAttributes.addFlashAttribute("alertType", "success");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("message", "상태 변경 중 오류가 발생했습니다.");
+            redirectAttributes.addFlashAttribute("alertType", "danger");
+        }
+
+        return "redirect:/admin/orders/" + id;
     }
 }

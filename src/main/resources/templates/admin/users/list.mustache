@@ -117,45 +117,48 @@
                 </div>
 
                 <!-- 페이징 -->
-                {{#users.content}}
-                    <nav aria-label="Page navigation" class="mt-4">
-                        <ul class="pagination justify-content-center">
-                            <!-- 이전 -->
-                            {{^users.first}}
-                                <li class="page-item">
-                                    <a class="page-link" href="/admin/users?page={{users.number}}&search={{search}}">
-                                    <i class="bi bi-chevron-left"></i> 이전
-                                    </a>
-                                </li>
-                            {{/users.first}}
-                            {{#users.first}}
-                                <li class="page-item disabled">
-                                    <span class="page-link"><i class="bi bi-chevron-left"></i> 이전</span>
-                                </li>
-                            {{/users.first}}
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
 
-                            <!-- 페이지 번호 -->
-                            <li class="page-item active">
-                                <span class="page-link">{{users.number}} / {{users.totalPages}}</span>
+                        <!-- 이전 -->
+                        {{^users.first}}
+                            <li class="page-item">
+                                <a class="page-link" href="/admin/users?page={{users.number}}&search={{search}}">
+                                <i class="bi bi-chevron-left"></i> 이전
+                                </a>
                             </li>
+                        {{/users.first}}
+                        {{#users.first}}
+                            <li class="page-item disabled">
+                <span class="page-link">
+                    <i class="bi bi-chevron-left"></i> 이전
+                </span>
+                            </li>
+                        {{/users.first}}
 
-                            <!-- 다음 -->
-                            {{^users.last}}
-                                <li class="page-item">
-                                    <a class="page-link" href="/admin/users?page={{users.nextPageable.pageNumber}}&search={{search}}">
-                                    다음 <i class="bi bi-chevron-right"></i>
-                                    </a>
-                                </li>
-                            {{/users.last}}
-                            {{#users.last}}
-                                <li class="page-item disabled">
-                                    <span class="page-link">다음 <i class="bi bi-chevron-right"></i></span>
-                                </li>
-                            {{/users.last}}
-                        </ul>
-                    </nav>
-                {{/users.content}}
-            </div>
+                        <!-- 페이지 번호 -->
+                        <li class="page-item active">
+                            <span class="page-link">{{users.number}} / {{users.totalPages}}</span>
+                        </li>
+
+                        <!-- 다음 -->
+                        {{^users.last}}
+                            <li class="page-item">
+                                <a class="page-link" href="/admin/users?page={{users.nextPageable.pageNumber}}&search={{search}}">
+                                다음 <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        {{/users.last}}
+                        {{#users.last}}
+                            <li class="page-item disabled">
+                <span class="page-link">
+                    다음 <i class="bi bi-chevron-right"></i>
+                </span>
+                            </li>
+                        {{/users.last}}
+
+                    </ul>
+                </nav>
         </div>
     </div>
 </div>
