@@ -1,10 +1,12 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.OrderDTO;
 import com.example.demo.dto.ProductDTO;
 import com.example.demo.entity.Category;
 import com.example.demo.entity.User;
 import com.example.demo.repository.CategoryRepository;
 import com.example.demo.service.CartService;
+import com.example.demo.service.OrderService;
 import com.example.demo.service.WishlistService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +27,7 @@ public class MyPageController {
     private final WishlistService wishlistService;
     private final CartService cartService;
     private final CategoryRepository categoryRepository;
+    private final OrderService orderService;
 
     // 마이페이지 메인
     @GetMapping
@@ -58,5 +61,17 @@ public class MyPageController {
         model.addAttribute("categories", categories);
 
         return "mypage/wishlist";
+    }
+
+    //주문 내역 확인
+    @GetMapping("/orders")
+    public String orders(@AuthenticationPrincipal User user, Model model) {
+
+        List<OrderDTO> orders = orderService.getOrdersByUsername(user.getUsername());
+
+        model.addAttribute("orders", orders);
+        model.addAttribute("user", user);
+
+        return "mypage/orders";
     }
 }

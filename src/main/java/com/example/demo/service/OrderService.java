@@ -220,4 +220,14 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
+    public List<OrderDTO> getOrdersByUsername(String username) {
+        List<Order> orders = orderRepository.findByMember_Username(username);
+
+        return orders.stream()
+                .map(OrderDTO::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+
+
 }
