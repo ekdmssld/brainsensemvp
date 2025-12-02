@@ -10,16 +10,21 @@
             <h5>회원 정보</h5>
             <p><strong>아이디:</strong> {{user.username}}</p>
             <p><strong>이메일:</strong> {{user.email}}</p>
-            <p><strong>전화번호:</strong> {{user.phone}}</p>
-            <p><strong>주소:</strong> {{user.address}}</p>
+            {{#user.phone}}
+                <p><strong>전화번호:</strong> {{user.phone}}</p>
+            {{/user.phone}}
+            {{#user.address}}
+                <p><strong>주소:</strong> {{user.address}}</p>
+            {{/user.address}}
         </div>
     </div>
 
     <!-- 메뉴 -->
     <div class="row">
-        <div class="col-md-4">
+        <!-- 위시리스트 -->
+        <div class="col-md-3">
             <a href="/mypage/wishlist" class="text-decoration-none">
-                <div class="card text-center">
+                <div class="card text-center h-100">
                     <div class="card-body">
                         <i class="bi bi-heart" style="font-size: 3rem; color: #dc3545;"></i>
                         <h5 class="mt-3">위시리스트</h5>
@@ -28,9 +33,11 @@
                 </div>
             </a>
         </div>
-        <div class="col-md-4">
+
+        <!-- 장바구니 -->
+        <div class="col-md-3">
             <a href="/cart" class="text-decoration-none">
-                <div class="card text-center">
+                <div class="card text-center h-100">
                     <div class="card-body">
                         <i class="bi bi-cart" style="font-size: 3rem; color: #0d6efd;"></i>
                         <h5 class="mt-3">장바구니</h5>
@@ -39,13 +46,28 @@
                 </div>
             </a>
         </div>
-        <div class="col-md-4">
+
+        <!-- 주문 내역 -->
+        <div class="col-md-3">
             <a href="/mypage/orders" class="text-decoration-none">
-                <div class="card text-center">
+                <div class="card text-center h-100">
                     <div class="card-body">
                         <i class="bi bi-box" style="font-size: 3rem; color: #198754;"></i>
                         <h5 class="mt-3">주문 내역</h5>
                         <p class="text-muted">{{orderCount}}개</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- 회원 정보 수정 -->
+        <div class="col-md-3">
+            <a href="/mypage/profile" class="text-decoration-none">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <i class="bi bi-person-gear" style="font-size: 3rem; color: #6f42c1;"></i>
+                        <h5 class="mt-3">회원 정보 수정</h5>
+                        <p class="text-muted">정보 수정</p>
                     </div>
                 </div>
             </a>

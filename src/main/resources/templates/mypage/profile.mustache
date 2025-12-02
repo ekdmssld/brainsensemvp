@@ -1,133 +1,143 @@
 {{>layouts/shop-header}}
 
-<div class="row">
-    <!-- 사이드바 -->
-    <div class="col-md-3">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="bi bi-person-circle"></i> 마이페이지</h5>
-            </div>
-            <div class="list-group list-group-flush">
-                <a href="/mypage" class="list-group-item list-group-item-action">
-                    <i class="bi bi-house"></i> 대시보드
-                </a>
-                <a href="/mypage/orders" class="list-group-item list-group-item-action">
-                    <i class="bi bi-bag"></i> 주문 내역
-                </a>
-                <a href="/mypage/profile" class="list-group-item list-group-item-action active">
-                    <i class="bi bi-person"></i> 회원 정보 수정
-                </a>
-                <a href="/cart" class="list-group-item list-group-item-action">
-                    <i class="bi bi-cart"></i> 장바구니
-                </a>
-                <a href="/logout" class="list-group-item list-group-item-action text-danger">
-                    <i class="bi bi-box-arrow-right"></i> 로그아웃
-                </a>
+<div class="container mt-4">
+    <!-- 메시지 표시 -->
+    {{#message}}
+        <div class="alert alert-{{alertType}} alert-dismissible fade show" role="alert">
+            {{message}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {{/message}}
+
+    <div class="row">
+        <!-- 사이드바 -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-person-circle"></i> 마이페이지</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="/mypage" class="list-group-item list-group-item-action">
+                        <i class="bi bi-house"></i> 대시보드
+                    </a>
+                    <a href="/mypage/orders" class="list-group-item list-group-item-action">
+                        <i class="bi bi-bag"></i> 주문 내역
+                    </a>
+                    <a href="/mypage/profile" class="list-group-item list-group-item-action active">
+                        <i class="bi bi-person"></i> 회원 정보 수정
+                    </a>
+                    <a href="/cart" class="list-group-item list-group-item-action">
+                        <i class="bi bi-cart"></i> 장바구니
+                    </a>
+                    <a href="/logout" class="list-group-item list-group-item-action text-danger">
+                        <i class="bi bi-box-arrow-right"></i> 로그아웃
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- 회원정보 수정 -->
-    <div class="col-md-9">
-        <h2><i class="bi bi-person"></i> 회원 정보 수정</h2>
-        <hr>
+        <!-- 회원정보 수정 -->
+        <div class="col-md-9">
+            <h2><i class="bi bi-person"></i> 회원 정보 수정</h2>
+            <hr>
 
-        <form action="/mypage/profile" method="post">
-            <!-- 기본 정보 -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">기본 정보</h5>
-                </div>
-                <div class="card-body">
-                    <!-- 아이디 (수정 불가) -->
-                    <div class="mb-3">
-                        <label class="form-label">
-                            <i class="bi bi-person"></i> 아이디
-                        </label>
-                        <input type="text" class="form-control" value="{{user.username}}" disabled>
-                        <small class="form-text text-muted">아이디는 변경할 수 없습니다.</small>
+            <form action="/mypage/profile" method="post">
+                <!-- 기본 정보 -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">기본 정보</h5>
                     </div>
+                    <div class="card-body">
+                        <!-- 아이디 (수정 불가) -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="bi bi-person"></i> 아이디
+                            </label>
+                            <input type="text" class="form-control" value="{{user.username}}" disabled>
+                            <small class="form-text text-muted">아이디는 변경할 수 없습니다.</small>
+                        </div>
 
-                    <!-- 이메일 -->
-                    <div class="mb-3">
-                        <label for="email" class="form-label">
-                            <i class="bi bi-envelope"></i> 이메일 <span class="text-danger">*</span>
-                        </label>
-                        <input type="email" class="form-control" id="email" name="email"
-                               value="{{user.email}}" required>
-                    </div>
+                        <!-- 이메일 -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label">
+                                <i class="bi bi-envelope"></i> 이메일 <span class="text-danger">*</span>
+                            </label>
+                            <input type="email" class="form-control" id="email" name="email"
+                                   value="{{user.email}}" required>
+                        </div>
 
-                    <!-- 전화번호 -->
-                    <div class="mb-3">
-                        <label for="phone" class="form-label">
-                            <i class="bi bi-telephone"></i> 전화번호
-                        </label>
-                        <input type="tel" class="form-control" id="phone" name="phone"
-                               value="{{user.phone}}" placeholder="010-1234-5678">
-                    </div>
+                        <!-- 전화번호 -->
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">
+                                <i class="bi bi-telephone"></i> 전화번호
+                            </label>
+                            <input type="tel" class="form-control" id="phone" name="phone"
+                                   value="{{user.phone}}" placeholder="010-1234-5678">
+                        </div>
 
-                    <!-- 주소 -->
-                    <div class="mb-0">
-                        <label for="address" class="form-label">
-                            <i class="bi bi-geo-alt"></i> 주소
-                        </label>
-                        <input type="text" class="form-control" id="address" name="address"
-                               value="{{user.address}}" placeholder="서울시 강남구">
-                    </div>
-                </div>
-            </div>
-
-            <!-- 비밀번호 변경 -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">비밀번호 변경</h5>
-                </div>
-                <div class="card-body">
-                    <p class="text-muted small">비밀번호를 변경하지 않으려면 아래 필드를 비워두세요.</p>
-
-                    <!-- 현재 비밀번호 -->
-                    <div class="mb-3">
-                        <label for="currentPassword" class="form-label">
-                            <i class="bi bi-lock"></i> 현재 비밀번호
-                        </label>
-                        <input type="password" class="form-control" id="currentPassword"
-                               name="currentPassword" placeholder="현재 비밀번호 입력">
-                    </div>
-
-                    <!-- 새 비밀번호 -->
-                    <div class="mb-3">
-                        <label for="newPassword" class="form-label">
-                            <i class="bi bi-lock-fill"></i> 새 비밀번호
-                        </label>
-                        <input type="password" class="form-control" id="newPassword"
-                               name="newPassword" placeholder="새 비밀번호 입력 (8자 이상)"
-                               minlength="8">
-                    </div>
-
-                    <!-- 새 비밀번호 확인 -->
-                    <div class="mb-0">
-                        <label for="newPasswordConfirm" class="form-label">
-                            <i class="bi bi-lock-fill"></i> 새 비밀번호 확인
-                        </label>
-                        <input type="password" class="form-control" id="newPasswordConfirm"
-                               placeholder="새 비밀번호 다시 입력">
-                        <small id="passwordError" class="form-text text-danger" style="display: none;">
-                            비밀번호가 일치하지 않습니다.
-                        </small>
+                        <!-- 주소 -->
+                        <div class="mb-0">
+                            <label for="address" class="form-label">
+                                <i class="bi bi-geo-alt"></i> 주소
+                            </label>
+                            <input type="text" class="form-control" id="address" name="address"
+                                   value="{{user.address}}" placeholder="서울시 강남구">
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- 버튼 -->
-            <div class="d-grid gap-2 mb-4">
-                <button type="submit" class="btn btn-primary btn-lg">
-                    <i class="bi bi-check-circle"></i> 정보 수정
-                </button>
-                <a href="/mypage" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left"></i> 취소
-                </a>
-            </div>
-        </form>
+                <!-- 비밀번호 변경 -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">비밀번호 변경</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted small">비밀번호를 변경하지 않으려면 아래 필드를 비워두세요.</p>
+
+                        <!-- 현재 비밀번호 -->
+                        <div class="mb-3">
+                            <label for="currentPassword" class="form-label">
+                                <i class="bi bi-lock"></i> 현재 비밀번호
+                            </label>
+                            <input type="password" class="form-control" id="currentPassword"
+                                   name="currentPassword" placeholder="현재 비밀번호 입력">
+                        </div>
+
+                        <!-- 새 비밀번호 -->
+                        <div class="mb-3">
+                            <label for="newPassword" class="form-label">
+                                <i class="bi bi-lock-fill"></i> 새 비밀번호
+                            </label>
+                            <input type="password" class="form-control" id="newPassword"
+                                   name="newPassword" placeholder="새 비밀번호 입력 (8자 이상)"
+                                   minlength="8">
+                        </div>
+
+                        <!-- 새 비밀번호 확인 -->
+                        <div class="mb-0">
+                            <label for="newPasswordConfirm" class="form-label">
+                                <i class="bi bi-lock-fill"></i> 새 비밀번호 확인
+                            </label>
+                            <input type="password" class="form-control" id="newPasswordConfirm"
+                                   placeholder="새 비밀번호 다시 입력">
+                            <small id="passwordError" class="form-text text-danger" style="display: none;">
+                                비밀번호가 일치하지 않습니다.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 버튼 -->
+                <div class="d-grid gap-2 mb-4">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-check-circle"></i> 정보 수정
+                    </button>
+                    <a href="/mypage" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> 취소
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -136,12 +146,22 @@
     const newPassword = document.getElementById('newPassword');
     const newPasswordConfirm = document.getElementById('newPasswordConfirm');
     const passwordError = document.getElementById('passwordError');
+    const form = document.querySelector('form');
 
     newPasswordConfirm.addEventListener('input', function() {
         if (newPassword.value !== newPasswordConfirm.value) {
             passwordError.style.display = 'block';
         } else {
             passwordError.style.display = 'none';
+        }
+    });
+
+    // 폼 제출 시 비밀번호 일치 확인
+    form.addEventListener('submit', function(e) {
+        if (newPassword.value && newPassword.value !== newPasswordConfirm.value) {
+            e.preventDefault();
+            alert('비밀번호가 일치하지 않습니다.');
+            newPasswordConfirm.focus();
         }
     });
 </script>

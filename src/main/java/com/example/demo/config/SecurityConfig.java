@@ -99,6 +99,7 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                     .ignoringRequestMatchers("/cart/**", "/wishlist/**", "/order/**")
                     .ignoringRequestMatchers("/admin/**")
                     .ignoringRequestMatchers("/inquiry/**")
+                    .ignoringRequestMatchers("/mypage/**")
             )
             .headers(headers -> headers
                     .frameOptions(frameOptions -> frameOptions.disable())

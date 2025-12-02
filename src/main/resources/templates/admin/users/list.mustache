@@ -75,12 +75,9 @@
                                         <td>{{id}}</td>
                                         <td>
                                             <strong>{{username}}</strong>
-                                            {{#role}}
-                                                {{#role.name}}
-                                                    {{#equals}}ADMIN{{/equals}}
-                                                    <span class="badge bg-danger">ADMIN</span>
-                                                {{/role.name}}
-                                            {{/role}}
+                                            {{#isAdmin}}
+                                                <span class="badge bg-danger ms-1">ADMIN</span>
+                                            {{/isAdmin}}
                                         </td>
                                         <td>{{email}}</td>
                                         <td>{{phone}}</td>
@@ -93,16 +90,12 @@
                                             {{/address}}
                                         </td>
                                         <td>
-                                            {{#role}}
-                                                {{#role.name}}
-                                                    {{#equals}}ADMIN{{/equals}}
-                                                    <span class="badge bg-danger">관리자</span>
-                                                {{/role.name}}
-                                                {{#role.name}}
-                                                    {{#equals}}USER{{/equals}}
-                                                    <span class="badge bg-primary">일반회원</span>
-                                                {{/role.name}}
-                                            {{/role}}
+                                            {{#isAdmin}}
+                                                <span class="badge bg-danger">관리자</span>
+                                            {{/isAdmin}}
+                                            {{#isUser}}
+                                                <span class="badge bg-primary">일반회원</span>
+                                            {{/isUser}}
                                         </td>
                                         <td>
                                             <small>{{createdAt}}</small>
