@@ -58,12 +58,24 @@ public class ProductController {
         }
 
         if(user != null){
-            for(ReviewDTO review : reviews){
-                review.setEditable(review.getMemberName().equals(user.getUsername()) );
+            boolean isAdmin = user.getAuthorities().stream()
+                    .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
 
-                review.getComments().forEach(comment ->
-                        comment.setDeletable(comment.getMemberName().equals(user.getUsername()))
-                );
+            for(ReviewDTO review : reviews){
+
+                boolean isAuthor = review.getMemberName().equals(user.getUsername());
+
+                // 리뷰 본인 여부
+                review.setEditable(isAuthor);
+
+                // ⭐ 댓글 작성 가능 여부: 리뷰 작성자 + 관리자
+                review.setCommentable(isAuthor || isAdmin);
+
+                // 댓글 삭제 가능 여부(본인 + 관리자)
+                review.getComments().forEach(comment -> {
+                    boolean isCommentAuthor = comment.getMemberName().equals(user.getUsername());
+                    comment.setDeletable(isCommentAuthor || isAdmin);
+                });
             }
         }
 
