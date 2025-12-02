@@ -40,7 +40,7 @@ VALUES ('Arduino UNO R3', '가장 기본적인 아두이노 보드로 초보자�
 -- Arduino MEGA 2560
 INSERT INTO products (name, description, price, stock_quantity, category_id, manufacturer, model_number, image_url, is_available, created_at)
 VALUES ('Arduino MEGA 2560', '더 많은 I/O 핀과 메모리를 제공하는 고급 아두이노 보드. 복잡한 프로젝트에 최적',
-        45000, 30, 7, 'Arduino', 'A000067', '/uploads/products/arduinoomega.jpg', true, CURRENT_TIMESTAMP);
+        45000, 30, 7, 'Arduino', 'A000067', '/uploads/products/arduinomega.jpg', true, CURRENT_TIMESTAMP);
 
 -- Arduino Nano
 INSERT INTO products (name, description, price, stock_quantity, category_id, manufacturer, model_number, image_url, is_available, created_at)
@@ -50,17 +50,17 @@ VALUES ('Arduino Nano', '소형 사이즈의 아두이노 보드. 브레드보�
 -- DHT11 (이미지 없음 → placeholder 유지 또는 새 파일 알려줘!)
 INSERT INTO products (name, description, price, stock_quantity, category_id, manufacturer, model_number, image_url, is_available, created_at)
 VALUES ('DHT11 온습도 센서', '온도와 습도를 동시에 측정하는 디지털 센서. 저렴하고 사용이 간편함',
-        5000, 100, 8, 'DFRobot', 'DHT11', 'https://via.placeholder.com/300x300.png?text=DHT11', true, CURRENT_TIMESTAMP);
+        5000, 100, 8, 'DFRobot', 'DHT11', '/uploads/products/pir.jpg', true, CURRENT_TIMESTAMP);
 
 -- DHT22 (이미지 없음)
 INSERT INTO products (name, description, price, stock_quantity, category_id, manufacturer, model_number, image_url, is_available, created_at)
 VALUES ('DHT22 온습도 센서', 'DHT11보다 정확한 고급 온습도 센서. 더 넓은 측정 범위 제공',
-        12000, 60, 8, 'DFRobot', 'DHT22', 'https://via.placeholder.com/300x300.png?text=DHT22', true, CURRENT_TIMESTAMP);
+        12000, 60, 8, 'DFRobot', 'DHT22', '/uploads/products/pir.jpg', true, CURRENT_TIMESTAMP);
 
 -- HC-SR04
 INSERT INTO products (name, description, price, stock_quantity, category_id, manufacturer, model_number, image_url, is_available, created_at)
 VALUES ('HC-SR04 초음파 센서', '초음파를 이용한 거리 측정 센서. 2cm~400cm 범위 측정 가능',
-        3500, 120, 9, 'HCSR', 'HC-SR04', '/uploads/products/hc-sr04.avif', true, CURRENT_TIMESTAMP);
+        3500, 120, 9, 'HCSR', 'HC-SR04', '/uploads/products/pir.jpg', true, CURRENT_TIMESTAMP);
 
 -- PIR 센서
 INSERT INTO products (name, description, price, stock_quantity, category_id, manufacturer, model_number, image_url, is_available, created_at)
@@ -85,7 +85,7 @@ VALUES ('28BYJ-48 스텝 모터', '5V 스텝 모터 + ULN2003 드라이버 보�
 -- LCD 디스플레이
 INSERT INTO products (name, description, price, stock_quantity, category_id, manufacturer, model_number, image_url, is_available, created_at)
 VALUES ('16x2 LCD 디스플레이', 'I2C 인터페이스 16x2 문자 LCD. 쉬운 연결과 적은 핀 사용',
-        9000, 65, 4, 'Generic', 'LCD1602-I2C', '/uploads/products/lcddisplay.png', true, CURRENT_TIMESTAMP);
+        9000, 65, 4, 'Generic', 'LCD1602-I2C', '/uploads/products/lcddisplay.jpg', true, CURRENT_TIMESTAMP);
 
 -- OLED 디스플레이
 INSERT INTO products (name, description, price, stock_quantity, category_id, manufacturer, model_number, image_url, is_available, created_at)

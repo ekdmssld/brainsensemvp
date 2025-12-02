@@ -53,25 +53,19 @@ public class CartController {
     @PostMapping("/add")
     public String addToCart(
             @AuthenticationPrincipal User user,
-            @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam Long productId,
             @RequestParam(defaultValue = "1") Integer quantity,
             RedirectAttributes redirectAttributes) {
 
-        if (userDetails == null) {
-            return "redirect:/login?redirect=/products/" + productId;
-        }
-
         try {
-            String username = userDetails.getUsername();
-            cartService.addToCart(username, productId, quantity);
+            cartService.addToCart(user.getUsername(), productId, quantity);
+            redirectAttributes.addFlashAttribute("message", "장바구니에 추가되었습니다.");
+            redirectAttributes.addFlashAttribute("alertType", "success");
+            return "redirect:/products/" + productId;
 
-            redirectAttributes.addFlashAttribute("msg", "장바구니에 상품이 추가되었습니다.");
-            return "redirect:/mypage?success=cart_added";
-
-        } catch (Exception e) {
-            log.error("장바구니 추가 실패", e);
-            redirectAttributes.addFlashAttribute("error", "장바구니 추가 중 오류가 발생했습니다.");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("message", e.getMessage());
+            redirectAttributes.addFlashAttribute("alertType", "danger");
             return "redirect:/products/" + productId;
         }
     }

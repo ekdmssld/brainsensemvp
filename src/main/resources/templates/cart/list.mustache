@@ -33,16 +33,32 @@
                             </div>
 
                             <!-- 수량 조절 -->
-                            <div class="col-md-3">
-                                <form action="/cart/update" method="post" class="d-flex align-items-center">
-                                    <input type="hidden" name="cartId" value="{{id}}">
-                                    <input type="number" name="quantity" value="{{quantity}}"
-                                           min="1" class="form-control form-control-sm me-2" style="width: 80px;">
-                                    <button type="submit" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-arrow-clockwise"></i>
-                                    </button>
-                                </form>
-                            </div>
+                            <form action="/cart/update" method="post" class="d-flex align-items-center">
+                                <input type="hidden" name="cartId" value="{{id}}">
+
+                                <button type="button" class="btn btn-outline-secondary decrease-btn">
+                                    <i class="bi bi-dash"></i>
+                                </button>
+
+                                <input
+                                        type="number"
+                                        class="form-control text-center quantity-input"
+                                        name="quantity"
+                                        value="{{quantity}}"
+                                        min="1"
+                                        max="{{stock}}"
+                                        readonly
+                                        style="width: 70px;"
+                                >
+
+                                <button type="button" class="btn btn-outline-secondary increase-btn">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+
+                                <button type="submit" class="btn btn-sm btn-outline-primary ms-2">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </button>
+                            </form>
 
                             <!-- 소계 -->
                             <div class="col-md-2">
@@ -96,5 +112,30 @@
         </div>
     {{/cartItems}}
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".quantity-input").forEach((input, index) => {
+            const decreaseBtn = document.querySelectorAll(".decrease-btn")[index];
+            const increaseBtn = document.querySelectorAll(".increase-btn")[index];
+
+            const maxStock = parseInt(input.getAttribute("max"));
+
+            decreaseBtn.addEventListener("click", () => {
+                let value = parseInt(input.value);
+                if (value > 1) input.value = value - 1;
+            });
+
+            increaseBtn.addEventListener("click", () => {
+                let value = parseInt(input.value);
+                if (value < maxStock) {
+                    input.value = value + 1;
+                } else {
+                    alert("재고 수량을 초과할 수 없습니다.");
+                }
+            });
+        });
+    });
+</script>
 
 {{>layouts/shop-footer}}

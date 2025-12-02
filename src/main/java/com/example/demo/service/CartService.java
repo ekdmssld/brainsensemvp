@@ -42,28 +42,38 @@ public class CartService {
                 .collect(Collectors.toList());
     }
 
-    // 장바구니에 상품 추가
+    @Transactional
     public void addToCart(String username, Long productId, Integer quantity) {
         User user = findUserByUsername(username);
+
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
 
-        // 이미 장바구니에 있는지 확인
-        Optional<Cart> existingCart = cartRepository.findByMemberAndProduct(user, product);  // ✅ findByMemberAndProduct
-
-        if (existingCart.isPresent()) {
-            // 수량만 증가
-            Cart cart = existingCart.get();
-            cart.addQuantity(quantity);
-            cartRepository.save(cart);
-        } else {
-            // 새로 추가
-            Cart newCart = Cart.createCart(user, product, quantity);
-            cartRepository.save(newCart);
+        // 재고 확인
+        if (quantity > product.getStockQuantity()) {
+            throw new IllegalArgumentException("재고가 부족합니다.");
         }
 
-        log.info("장바구니 추가 - username: {}, productId: {}, quantity: {}",
-                username, productId, quantity);
+        // 이미 장바구니에 있는지 확인
+        Optional<Cart> existingCart = cartRepository.findByMemberAndProduct(user, product);
+
+        if (existingCart.isPresent()) {
+            // 이미 있으면 수량 추가
+            Cart cart = existingCart.get();
+            int newQuantity = cart.getQuantity() + quantity;
+
+            if (newQuantity > product.getStockQuantity()) {
+                throw new IllegalArgumentException("재고가 부족합니다.");
+            }
+
+            cart.changeQuantity(newQuantity);
+        } else {
+            // 없으면 새로 추가
+            Cart cart = Cart.createCart(user, product, quantity);
+            cartRepository.save(cart);
+        }
+
+        log.info("장바구니 추가 - username: {}, productId: {}, quantity: {}", username, productId, quantity);
     }
 
     // 장바구니 아이템 수량 변경

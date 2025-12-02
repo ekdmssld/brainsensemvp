@@ -59,26 +59,27 @@ public class UserController {
      * GET /signup
      */
     @GetMapping("/signup")
-    public String signupPage(HttpServletRequest request, Model model) {
-        CsrfToken token = (CsrfToken) request.getAttribute("_csrf");
+    public String signupForm(Model model, HttpServletRequest request) {
 
-        model.addAttribute("csrfToken", token.getToken());
-        model.addAttribute("csrfParameterName", token.getParameterName());
+        CsrfToken csrf = (CsrfToken) request.getAttribute("_csrf");
+        if (csrf != null) {
+            model.addAttribute("csrfParameterName", csrf.getParameterName());
+            model.addAttribute("csrfToken", csrf.getToken());
+        }
 
-        return "user/signup";
+        return "user/signup";   // 템플릿 경로에 맞게
     }
 
-
-    /**
-     * 회원가입 처리
-     * POST /signup
-     */
     @PostMapping("/signup")
-    public String signup(AddUserRequest request, Model model) {
+    public String signup(AddUserRequest request, Model model, HttpServletRequest httpRequest) {
         log.info("회원가입 요청 - username: {}, email: {}", request.getUsername(), request.getEmail());
 
+        // CSRF 다시 주입
+        CsrfToken csrf = (CsrfToken) httpRequest.getAttribute("_csrf");
+        model.addAttribute("csrfParameterName", csrf.getParameterName());
+        model.addAttribute("csrfToken", csrf.getToken());
+
         try {
-            // 중복 체크
             if (userRepository.findByUsername(request.getUsername()).isPresent()) {
                 model.addAttribute("error", "이미 사용 중인 아이디입니다.");
                 return "user/signup";
@@ -89,23 +90,20 @@ public class UserController {
                 return "user/signup";
             }
 
-            // 비밀번호 암호화
             String encodedPassword = bCryptPasswordEncoder.encode(request.getPassword());
 
-            // ❌ 첫 번째 사용자 ADMIN 로직 제거
-            // 일반 사용자로 생성
             User user = User.builder()
                     .username(request.getUsername())
                     .email(request.getEmail())
                     .password(encodedPassword)
                     .phone(request.getPhone())
                     .address(request.getAddress())
-                    .role(User.Role.USER)  // ✅ 기본은 USER
+                    .role(User.Role.USER)
                     .build();
 
             userRepository.save(user);
 
-            log.info("회원가입 성공 - username: {}, role: USER", request.getUsername());
+            log.info("회원가입 성공!");
             return "redirect:/login?signup=success";
 
         } catch (Exception e) {
