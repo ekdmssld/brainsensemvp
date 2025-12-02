@@ -105,47 +105,46 @@
                 </div>
             {{/products.content}}
 
-            <!-- 페이징 (한 번만 나오게, 반복문 밖으로 뺌) -->
+            <!-- 페이징 -->
             {{#products.totalPages}}
                 <nav aria-label="Page navigation" class="mt-4">
                     <ul class="pagination justify-content-center">
                         <!-- 이전 -->
                         {{^products.first}}
                             <li class="page-item">
-                                <a class="page-link" href="/products?page={{products.number}}">
+                                <a class="page-link" href="/products?page={{prevPage}}{{#selectedCategory}}&category={{selectedCategory}}{{/selectedCategory}}{{#keyword}}&search={{keyword}}{{/keyword}}">
                                 <i class="bi bi-chevron-left"></i> 이전
                                 </a>
                             </li>
                         {{/products.first}}
                         {{#products.first}}
                             <li class="page-item disabled">
-                                <span class="page-link">
-                                    <i class="bi bi-chevron-left"></i> 이전
-                                </span>
+                    <span class="page-link">
+                        <i class="bi bi-chevron-left"></i> 이전
+                    </span>
                             </li>
                         {{/products.first}}
 
                         <!-- 현재 페이지 / 전체 페이지 -->
                         <li class="page-item active">
-                            <span class="page-link">
-                                {{products.number}} / {{products.totalPages}}
-                            </span>
+                <span class="page-link">
+                    {{currentPage}} / {{products.totalPages}}
+                </span>
                         </li>
 
                         <!-- 다음 -->
                         {{^products.last}}
                             <li class="page-item">
-                                <a class="page-link"
-                                   href="/products?page={{products.nextPageable.pageNumber}}">
+                                <a class="page-link" href="/products?page={{nextPage}}{{#selectedCategory}}&category={{selectedCategory}}{{/selectedCategory}}{{#keyword}}&search={{keyword}}{{/keyword}}">
                                 다음 <i class="bi bi-chevron-right"></i>
                                 </a>
                             </li>
                         {{/products.last}}
                         {{#products.last}}
                             <li class="page-item disabled">
-                                <span class="page-link">
-                                    다음 <i class="bi bi-chevron-right"></i>
-                                </span>
+                    <span class="page-link">
+                        다음 <i class="bi bi-chevron-right"></i>
+                    </span>
                             </li>
                         {{/products.last}}
                     </ul>

@@ -71,6 +71,8 @@ public class MainController {
         model.addAttribute("products", productPage);
         model.addAttribute("categories", categories);
         model.addAttribute("currentPage", page);
+        model.addAttribute("prevPage", page > 0 ? page - 1 : 0);
+        model.addAttribute("nextPage", page + 1);
         model.addAttribute("totalPages", productPage.getTotalPages());
         model.addAttribute("search", search == null ? "" : search);
         model.addAttribute("selectedCategory", category);

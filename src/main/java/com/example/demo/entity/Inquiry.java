@@ -67,7 +67,7 @@ public class Inquiry {
         this.comments.add(comment);
         comment.setInquiry(this);
         // 댓글이 추가되면 자동으로 답변완료 상태로 변경
-        if (this.status == InquiryStatus.PENDING) {
+        if (comment.getIsAdmin() && this.status == InquiryStatus.PENDING) {
             this.status = InquiryStatus.ANSWERED;
         }
     }

@@ -44,13 +44,13 @@
                     <div class="col-md-3">
                         <div class="input-group" style="max-width: 200px;">
                             <button class="btn btn-outline-secondary" type="button"
-                                    onclick="updateQuantity({{id}}, {{quantity}} - 1)">
+                                    onclick="updateQuantity({{id}}, {{quantity}} - 1, {{stock}})">
                                 <i class="bi bi-dash"></i>
                             </button>
                             <input type="number" class="form-control text-center" value="{{quantity}}"
                                    min="1" readonly>
                             <button class="btn btn-outline-secondary" type="button"
-                                    onclick="updateQuantity({{id}}, {{quantity}} + 1)">
+                                    onclick="updateQuantity({{id}}, {{quantity}} + 1, {{stock}})">
                                 <i class="bi bi-plus"></i>
                             </button>
                         </div>
@@ -117,9 +117,15 @@
 
 <script>
     // 수량 업데이트
-    function updateQuantity(cartId, newQuantity) {
+    function updateQuantity(cartId, newQuantity, maxStock) {
         if (newQuantity < 1) {
             alert('수량은 최소 1개 이상이어야 합니다.');
+            return;
+        }
+
+        // 🔥 재고 체크 추가
+        if (newQuantity > maxStock) {
+            alert('재고 수량을 초과할 수 없습니다.');
             return;
         }
 
