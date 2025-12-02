@@ -26,9 +26,18 @@ public class AdminInquiryController {
 
     private final InquiryService inquiryService;
 
+    // ✅ 헤더에서 공통으로 쓰는 값 세팅 (관리자 화면에서는 0으로만 넣어도 OK)
+    private void addHeaderAttributes(Model model, User user) {
+        model.addAttribute("user", user);
+        model.addAttribute("wishlistCount", 0);
+        model.addAttribute("cartCount", 0);
+        model.addAttribute("orderCount", 0);
+    }
+
     // 문의 목록 (관리자)
     @GetMapping
     public String list(
+            @AuthenticationPrincipal User user,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(required = false) String keyword,
             Model model) {
@@ -50,6 +59,9 @@ public class AdminInquiryController {
         model.addAttribute("pendingCount", pendingCount);
         model.addAttribute("currentPage", page);
 
+        // 🔹 헤더용 공통 값
+        addHeaderAttributes(model, user);
+
         log.info("관리자 문의 목록 조회 - 페이지: {}", page);
         return "admin/inquiry/list";
     }
@@ -66,7 +78,9 @@ public class AdminInquiryController {
 
         model.addAttribute("inquiry", inquiry);
         model.addAttribute("comments", comments);
-        model.addAttribute("user", user);
+
+        // 🔹 헤더용 공통 값
+        addHeaderAttributes(model, user);
 
         log.info("관리자 문의 상세 조회 - ID: {}", id);
         return "admin/inquiry/detail";

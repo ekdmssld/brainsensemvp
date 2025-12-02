@@ -73,7 +73,7 @@ public class AdminController {
         model.addAttribute("totalUsers", totalUsers);
         model.addAttribute("recentOrders", recentOrders);
         model.addAttribute("pendingInquiryCount", pendingInquiryCount);
-        model.addAttribute("recentInquires", recentInquiries);
+        model.addAttribute("recentInquiries", recentInquiries);
         model.addAttribute("user", user);
 
         return "admin/dashboard";
