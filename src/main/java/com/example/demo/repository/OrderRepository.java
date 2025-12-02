@@ -26,4 +26,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findAllByOrderByOrderDateDesc();
 
     List<Order> findByMember_Username(String username);
+
+    int countByMember(User member);
 }

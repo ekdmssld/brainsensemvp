@@ -35,6 +35,8 @@ public class MyPageController {
             @AuthenticationPrincipal User user,
             Model model) {
 
+        int orderCount = orderService.countOrdersByUsername(user.getUsername());
+
         List<Category> categories = categoryRepository.findByParentIsNull();
         long wishlistCount = wishlistService.getWishlistCount(user);
         long cartCount = cartService.getCartCount(user);
@@ -43,6 +45,7 @@ public class MyPageController {
         model.addAttribute("categories", categories);
         model.addAttribute("wishlistCount", wishlistCount);
         model.addAttribute("cartCount", cartCount);
+        model.addAttribute("orderCount", orderCount);
 
         return "mypage/index";
     }
