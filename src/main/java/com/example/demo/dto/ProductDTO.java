@@ -15,6 +15,7 @@ import java.util.Locale;
 @AllArgsConstructor
 @Builder
 public class ProductDTO {
+
     private Long id;
     private String name;
     private Integer price;
@@ -27,18 +28,21 @@ public class ProductDTO {
     private Boolean isAvailable;
     private LocalDateTime createdAt;
 
-    //Entity -> DTO 변환
-    public static ProductDTO fromEntity(Product product){
+    private static String safe(String v) {
+        return (v == null || v.trim().isEmpty()) ? null : v;
+    }
+
+    public static ProductDTO fromEntity(Product product) {
         return ProductDTO.builder()
                 .id(product.getId())
-                .name(product.getName())
+                .name(safe(product.getName()))
                 .price(product.getPrice())
-                .description(product.getDescription())
-                .imageUrl(product.getImageUrl())
+                .description(safe(product.getDescription()))
+                .imageUrl(safe(product.getImageUrl()))
                 .stock(product.getStockQuantity())
                 .categoryName(product.getCategory().getId())
-                .manufacturer(product.getManufacturer())
-                .modelNumber(product.getModelNumber())
+                .manufacturer(safe(product.getManufacturer()))
+                .modelNumber(safe(product.getModelNumber()))
                 .isAvailable(product.getIsAvailable())
                 .createdAt(product.getCreatedAt())
                 .build();
@@ -48,6 +52,7 @@ public class ProductDTO {
         NumberFormat formatter = NumberFormat.getNumberInstance(Locale.KOREA);
         return formatter.format(price) + "원";
     }
+
     public boolean hasStock() {
         return stock != null && stock > 0;
     }

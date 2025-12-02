@@ -14,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 @AllArgsConstructor
 @Builder
 public class ReviewCommentDTO {
+
     private Long id;
     private Long reviewId;
     private Long memberId;
@@ -24,18 +25,29 @@ public class ReviewCommentDTO {
 
     // UI용 필드
     private String formattedCreatedAt;
-    private boolean deletable; // 삭제 가능 여부
+    private boolean deletable;
+
+    private static String safe(String value) {
+        return (value == null || value.trim().isEmpty()) ? null : value;
+    }
 
     public static ReviewCommentDTO fromEntity(ReviewComment comment) {
+        String safeName = comment.getMember().getUsername();
+        if (safeName == null || safeName.isBlank()) {
+            safeName = "관리자";
+        }
+
         return ReviewCommentDTO.builder()
                 .id(comment.getId())
                 .reviewId(comment.getReview().getId())
                 .memberId(comment.getMember().getId())
-                .memberName(comment.getMember().getUsername())
-                .content(comment.getContent())
+                .memberName(safeName)
+                .content(comment.getContent() == null ? "" : comment.getContent())
                 .createdAt(comment.getCreatedAt())
                 .updatedAt(comment.getUpdatedAt())
-                .formattedCreatedAt(comment.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
+                .formattedCreatedAt(
+                        comment.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+                )
                 .build();
     }
 }

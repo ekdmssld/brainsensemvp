@@ -1,6 +1,12 @@
 {{>layouts/shop-header}}
 
 <div class="container mt-4">
+    {{#message}}
+        <div class="alert alert-{{alertType}} alert-dismissible fade show" role="alert">
+            {{message}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {{/message}}
     <h2><i class="bi bi-receipt"></i> 주문 상세 (#{{order.id}})</h2>
     <form action="/admin/orders/{{order.id}}/status" method="post" class="mt-3">
 

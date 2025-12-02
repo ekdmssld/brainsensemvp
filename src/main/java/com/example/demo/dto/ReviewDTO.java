@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Builder
 public class ReviewDTO {
+
     private Long id;
     private Long memberId;
     private String memberName;
@@ -25,33 +26,43 @@ public class ReviewDTO {
     private String content;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
     private List<ReviewCommentDTO> comments;
 
     // UI용 필드
     private String formattedCreatedAt;
     private String formattedUpdatedAt;
-    private boolean editable; // 작성자 본인인지
+    private boolean editable;
+
+    private static String safe(String v) {
+        return (v == null || v.trim().isEmpty()) ? null : v;
+    }
 
     public static ReviewDTO fromEntity(Review review) {
+
+        LocalDateTime created = review.getCreatedAt();
+        LocalDateTime updated = review.getUpdatedAt();
+
         return ReviewDTO.builder()
                 .id(review.getId())
                 .memberId(review.getMember().getId())
-                .memberName(review.getMember().getUsername())
+                .memberName(safe(review.getMember().getUsername()))
                 .productId(review.getProduct().getId())
-                .productName(review.getProduct().getName())
+                .productName(safe(review.getProduct().getName()))
                 .rating(review.getRating())
-                .content(review.getContent())
-                .createdAt(review.getCreatedAt())
-                .updatedAt(review.getUpdatedAt())
-                .formattedCreatedAt(review.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
-                .formattedUpdatedAt(review.getUpdatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
+                .content(safe(review.getContent()))
+                .createdAt(created)
+                .updatedAt(updated)
+                .formattedCreatedAt(created != null ?
+                        created.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) : "")
+                .formattedUpdatedAt(updated != null ?
+                        updated.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) : "")
                 .comments(review.getComments().stream()
                         .map(ReviewCommentDTO::fromEntity)
                         .collect(Collectors.toList()))
                 .build();
     }
 
-    // 별점 표시용 (★★★★★)
     public String getStarRating() {
         return "★".repeat(rating) + "☆".repeat(5 - rating);
     }

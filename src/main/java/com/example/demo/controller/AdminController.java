@@ -141,6 +141,6 @@ public class AdminController {
             redirectAttributes.addFlashAttribute("alertType", "danger");
         }
 
-        return "redirect:/admin/orders/" + id;
+        return "redirect:/admin/orders";
     }
 }
