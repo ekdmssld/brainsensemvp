@@ -92,6 +92,17 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-3">
+                        <div class="card text-white bg-warning">
+                            <div class="card-body">
+                                <h5 class="card-title">답변 대기</h5>
+                                <h2 class="mb-0">{{pendingInquiryCount}}건</h2>
+                                <a href="/admin/inquiry" class="text-white text-decoration-none">
+                                    <small><i class="bi bi-arrow-right-circle"></i> 바로가기</small>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- 최근 주문 -->
@@ -123,6 +134,55 @@
                                         <td>{{formattedOrderDate}}</td>
                                     </tr>
                                 {{/recentOrders}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="bi bi-headset"></i> 최근 문의</h5>
+                            <a href="/admin/inquiry" class="btn btn-sm btn-outline-primary">
+                                전체보기 <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th width="80">번호</th>
+                                    <th width="100">작성자</th>
+                                    <th width="120">유형</th>
+                                    <th>제목</th>
+                                    <th width="100">상태</th>
+                                    <th width="150">작성일</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {{#recentInquiries}}
+                                    <tr>
+                                        <td>{{id}}</td>
+                                        <td>{{username}}</td>
+                                        <td><span class="badge bg-info">{{typeDescription}}</span></td>
+                                        <td>
+                                            <a href="/admin/inquiry/{{id}}" class="text-decoration-none">
+                                                {{title}}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{{statusBadgeClass}}">{{statusDescription}}</span>
+                                        </td>
+                                        <td class="text-muted small">{{formattedCreatedAt}}</td>
+                                    </tr>
+                                {{/recentInquiries}}
+                                {{^recentInquiries}}
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">문의 내역이 없습니다.</td>
+                                    </tr>
+                                {{/recentInquiries}}
                                 </tbody>
                             </table>
                         </div>

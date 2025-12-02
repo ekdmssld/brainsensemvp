@@ -1,22 +1,27 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.InquiryDTO;
 import com.example.demo.dto.OrderDTO;
 import com.example.demo.dto.ProductDTO;
 import com.example.demo.entity.Category;
+import com.example.demo.entity.Inquiry;
 import com.example.demo.entity.Order;
 import com.example.demo.entity.User;
 import com.example.demo.repository.CategoryRepository;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.ProductRepository;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.service.InquiryService;
 import com.example.demo.service.OrderService;
 import com.example.demo.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,19 +46,23 @@ public class AdminController {
     private final UserRepository userRepository;
     private final OrderService orderService;
     private final CategoryRepository categoryRepository;
+    private final InquiryService inquiryService;
 
     /**
      * 관리자 대시보드
      * GET /admin
      */
     @GetMapping
-    public String dashboard(Model model) {
+    public String dashboard(@AuthenticationPrincipal User user, Model model) {
         log.info("관리자 대시보드 접근");
 
         long totalProducts = productRepository.count();
         long totalOrders = orderRepository.count();
         long totalUsers = userRepository.count();
+        long pendingInquiryCount = inquiryService.getPendingInquiryCount();
 
+        Pageable pageable = PageRequest.of(0, 5, Sort.by("createdAt").descending());
+        List<InquiryDTO> recentInquiries = inquiryService.getAllInquiries(pageable).getContent();
         List<OrderDTO> recentOrders = orderRepository.findAll().stream()
                 .limit(5)
                 .map(OrderDTO::fromEntity)
@@ -63,6 +72,9 @@ public class AdminController {
         model.addAttribute("totalOrders", totalOrders);
         model.addAttribute("totalUsers", totalUsers);
         model.addAttribute("recentOrders", recentOrders);
+        model.addAttribute("pendingInquiryCount", pendingInquiryCount);
+        model.addAttribute("recentInquires", recentInquiries);
+        model.addAttribute("user", user);
 
         return "admin/dashboard";
     }

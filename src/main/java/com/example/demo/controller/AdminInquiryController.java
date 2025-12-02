@@ -41,6 +41,7 @@ public class AdminInquiryController {
             model.addAttribute("keyword", keyword);
         } else {
             inquiries = inquiryService.getAllInquiries(pageable);
+            model.addAttribute("keyword", "");
         }
 
         long pendingCount = inquiryService.getPendingInquiryCount();

@@ -74,6 +74,7 @@ public class MainController {
         model.addAttribute("totalPages", productPage.getTotalPages());
         model.addAttribute("search", search == null ? "" : search);
         model.addAttribute("selectedCategory", category);
+        model.addAttribute("user", user);
 
         return "products/list";
     }
